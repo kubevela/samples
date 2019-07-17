@@ -1,0 +1,77 @@
+apiVersion: core.hydra.io/v1alpha1
+kind: OperationalConfiguration
+metadata:
+    name: fireworks-deployment-config
+    description: Customized version of the fireworks components
+spec:
+  variables:
+    - name: web-port
+      value: 8080
+    - name: urls 
+      value: "http://+:8080"
+    - name: objectcounter
+      value: "1"
+    - name: color1
+      value: "red"
+    - name: color2 
+      value: "green"
+    - name: color3 
+      value: "blue"
+    - name: web-count
+      value: 1
+    - name: worker-count
+      value: 1
+    - name: network_name_value 
+      value: ""
+    - name: subnetPrefix
+      value: ""
+  scopes: 
+    - name: fireworks-vnet
+      type: core.hydra.io/v1alpha1.Network
+      properties:
+        - name: networkName
+          value: "[fromVariable(network_name_value)]"
+        - name: subnetPrefix          
+          value: "[fromVariable(subnet_prefix_value)]"
+  components:
+    - componentName: fireworks-web
+      instanceName: fireworks-web
+      replicaCount: "[fromVariable(web-count)]"
+      parameterValues: 
+            - name: urls 
+              value: "[fromVariable(urls)]"
+            - name: objectcounter
+              value: "[fromVariable(objectcounter)]"
+      traits:
+        - name: fireworks-ingress
+          type: core.hydra.io/v1alpha1.Ingress
+          public: true
+          parameterValues:
+            - name: port
+              value: "[fromVariable(web-port)]"
+      applicationScopes: 
+        - fireworks-vnet
+    - componentName: fireworks-worker
+      instanceName: fireworks-worker1
+      replicaCount: "[fromVariable(worker-count)]"
+      parameterValues: 
+            - name: objecttype
+              value: "[fromVariable(color1)]"     
+      applicationScopes: 
+        - fireworks-vnet               
+    - componentName: fireworks-worker
+      instanceName: fireworks-worker2
+      replicaCount: "[fromVariable(worker-count)]"
+      parameterValues: 
+            - name: objecttype
+              value: "[fromVariable(color2)]"       
+      applicationScopes: 
+        - fireworks-vnet              
+    - componentName: fireworks-worker
+      instanceName: fireworks-worker3
+      replicaCount: "[fromVariable(worker-count)]"      
+      parameterValues: 
+            - name: objecttype
+              value: "[fromVariable(color3)]"       
+      applicationScopes: 
+        - fireworks-vnet               

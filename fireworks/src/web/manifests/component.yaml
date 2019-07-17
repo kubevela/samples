@@ -1,0 +1,31 @@
+apiVersion: core.hydra.io/v1alpha1
+kind: ComponentSchematic
+metadata:
+  name: fireworks-frontend
+  version: "1.0.0"
+  description: Fireworks Web Container
+spec:
+  workloadType: core.hydra.io/v1.Replicated
+  parameters:
+  - name: urls
+    description: The message to display in the web app.
+    type: string
+  - name: objectcounter
+    description: The message to display in the web app.
+    type: string
+  - name: web-port
+    description: The port for the fireworks frontend
+    type: string
+  ostype: linux
+  containers:
+    - name: web
+      ports:
+        fromParam: web-port
+      env:
+      - name: ASPNETCORE_URLS
+        fromParam: urls
+      - name: OBJECTCOUNTER_MAX_COUNT_OUTPUT_LIMIT
+        fromParam: objectcounter
+      image:
+        name: seabreeze/azure-mesh-fireworks-web:1.1-alpine
+        digest: sha256:6c3c624b58dbbcd3c0dd82b4c53f04194d1247c6eebdaab7c610cf7d66709b3b
