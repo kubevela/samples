@@ -9,21 +9,20 @@ The purpose of this proof-of-concept is as follows:
 
 - Illustrate that applications defined with the Mesh specification can be defined using the Hydra spec
 
+- Show the developer and operational tasks required to build and deliver the application
+
 - Within the specification, this will stress test the following:
     - Reuse components
     - Service discovery 
     - Manual scaling 
     - Public Ingress 
     - Network Scope (bringing existing network)
+    - Component - Replicated Service
 
 ## Out of Scope 
 
 This proof of concept is not concerned with addressing the following: 
 
-- Separation of concerns and the personas that author each of the YAML files 
-- Local development of indvidual services
-- Dependency management and testing during development
-- Handoff between development and operations including a CI/CD pipeline 
 - Any part of the Hydra specification not explicitly mentioned in the **Purpose**
 
 ## Scenario & Architecture 
