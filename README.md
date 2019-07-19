@@ -1,14 +1,9 @@
+# Hydra Examples 
 
-# Contributing
+This repository contains examples of how developers and app operators can work together to build an application and then deploy it to a Hydra implementation. 
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
+## Table of Contents 
 
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+1. Fireworks - The fireworks is the simplest example containing a single web frontend that is polled by the worker components. The worker components provide the color of the firework and the web frontend is responsible for displaying this. This example goes over how two separate developers can independently work on these microservices and then the application operator can deploy the whole application into an existing VNET, provide public ingress and define autoscaling rules independent of the developers getting involved. 
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+    There is a focus on how developers build microservices, test and then hand off the package to the app operators. The application operators are in charge of their CI/CD pipelines using existing Hydra APIs.
