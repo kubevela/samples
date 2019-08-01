@@ -6,25 +6,23 @@ metadata:
 spec:
   variables:
     - name: web-port
-      value: 8080
-    - name: urls 
-      value: "http://+:8080"
+      value: 80
     - name: objectcounter
-      value: "1"
+      value: 500
     - name: color1
-      value: "red"
+      value: red
     - name: color2 
-      value: "green"
+      value: green
     - name: color3 
-      value: "blue"
+      value: blue
     - name: web-count
       value: 1
     - name: worker-count
       value: 1
     - name: network_name_value 
-      value: ""
-    - name: subnetPrefix
-      value: ""
+      value: fireworks-subnet
+    - name: subnet_prefix_value
+      value: 172.16.0.1/24
   scopes: 
     - name: fireworks-vnet
       type: core.hydra.io/v1alpha1.Network
@@ -37,8 +35,6 @@ spec:
     - componentName: fireworks-frontend
       instanceName: fireworks-frontend
       parameterValues: 
-        - name: urls 
-          value: "[fromVariable(urls)]"
         - name: objectcounter
           value: "[fromVariable(objectcounter)]"
       traits:
@@ -55,10 +51,11 @@ spec:
       applicationScopes: 
         - name: fireworks-vnet
           type: core.hydra.io/v1alpha1.Network
+
     - componentName: fireworks-worker
       instanceName: fireworks-worker1
       parameterValues: 
-            - name: objecttype
+            - name: firework_color
               value: "[fromVariable(color1)]"
       traits:
         - name: worker-scaler
@@ -67,11 +64,12 @@ spec:
             replicaCount: "[fromVariable(worker-count)]"     
       applicationScopes: 
         - name: fireworks-vnet
-          type: core.hydra.io/v1alpha1.Network     
+          type: core.hydra.io/v1alpha1.Network  
+
     - componentName: fireworks-worker
       instanceName: fireworks-worker2
       parameterValues: 
-            - name: objecttype
+            - name: firework_color
               value: "[fromVariable(color2)]"
       traits:
         - name: worker-scaler
@@ -81,10 +79,11 @@ spec:
       applicationScopes: 
         - name: fireworks-vnet
           type: core.hydra.io/v1alpha1.Network
+
     - componentName: fireworks-worker
       instanceName: fireworks-worker3   
       parameterValues: 
-            - name: objecttype
+            - name: firework_color
               value: "[fromVariable(color3)]"       
       traits:
         - name: worker-scaler

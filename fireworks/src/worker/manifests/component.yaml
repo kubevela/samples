@@ -2,22 +2,28 @@ apiVersion: core.hydra.io/v1alpha1
 kind: ComponentSchematic
 metadata:
   name: fireworks-worker
-  version: "1.0.0"
+  version: 1.0.0
   description: Fireworks Worker Container
 spec:
   workloadType: core.hydra.io/v1.Replicated
   parameters:
-  - name: objecttype
-    description: The color of the fireworks
+  - name: firework_color
+    description: The color of the firework
     type: string
   ostype: linux
   containers:
     - name: worker
       ports:
-        - 80
+      - name: http
+        value: 80
+      resources:
+        cpu: 
+          required: 2.0
+        memory: 
+          required: 4G      
       env:
       - name: OBJECT_TYPE
-        fromParam: objecttype
+        fromParam: firework_color
       image:
         name: vipulmmsft/azure-mesh-fireworks-worker-v1:0.4-strech
         digest: sha256:6c3c624b58dbbcd3c0dd82b4c53f04194d1247c6eebdaab7c610cf7d66709b3b
