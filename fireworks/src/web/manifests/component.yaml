@@ -20,7 +20,7 @@ spec:
           required: 4G
       ports: 
       - name: http
-        value: 80
+        containerPort: 80
       env:
       - name: ASPNETCORE_URLS
         value: http://+:80

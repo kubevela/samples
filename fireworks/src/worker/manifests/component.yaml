@@ -15,7 +15,7 @@ spec:
     - name: worker
       ports:
       - name: http
-        value: 80
+        containerPort: 80
       resources:
         cpu: 
           required: 2.0
