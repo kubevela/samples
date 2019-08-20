@@ -10,6 +10,9 @@ spec:
   - name: firework_color
     description: The color of the firework
     type: string
+  - name: object_counter_address
+    description: The address of the web frontend
+    type: string
   ostype: linux
   containers:
     - name: worker
@@ -24,6 +27,8 @@ spec:
       env:
       - name: OBJECT_TYPE
         fromParam: firework_color
+      - name: OBJECTCOUNTER_ADDRESS
+        fromParam: object_counter_address
       image:
         name: vipulmmsft/azure-mesh-fireworks-worker-v1:0.4-strech
         digest: sha256:6c3c624b58dbbcd3c0dd82b4c53f04194d1247c6eebdaab7c610cf7d66709b3b
