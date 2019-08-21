@@ -1,0 +1,47 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "westus2"
+        },
+        "applicationGatewayName": {
+            "value": "suhuruli-ag"
+        },
+        "tier": {
+            "value": "Standard"
+        },
+        "skuSize": {
+            "value": "Standard_Large"
+        },
+        "capacity": {
+            "value": 2
+        },
+        "subnetName": {
+            "value": "default"
+        },
+        "zones": {
+            "value": []
+        },
+        "virtualNetworkName": {
+            "value": "suhuruli-vnet"
+        },
+        "virtualNetworkPrefix": {
+            "value": [
+                "10.1.0.0/16"
+            ]
+        },
+        "publicIpAddressName": {
+            "value": "suhurulipublic"
+        },
+        "sku": {
+            "value": "Basic"
+        },
+        "allocationMethod": {
+            "value": "Dynamic"
+        },
+        "publicIpZones": {
+            "value": []
+        }
+    }
+}

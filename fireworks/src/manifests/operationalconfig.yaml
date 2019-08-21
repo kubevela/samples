@@ -20,7 +20,7 @@ spec:
     - name: worker-count
       value: 3
     - name: subnet_name_value 
-      value: subscriptions/1520019f-4b18-4cd4-a84d-b931699b2e8e/resourceGroups/suhurulirg/providers/Microsoft.Network/virtualNetworks/testvnet/subnets/suhurulihydrasubnet
+      value: /subscriptions/1520019f-4b18-4cd4-a84d-b931699b2e8e/resourceGroups/suhuruli-fireworks/providers/Microsoft.Network/virtualNetworks/suhuruli-vnet/subnets/hydra
   scopes: 
     - name: testNetworkScope2
       type: core.hydra.io/v1alpha1.Network
@@ -54,7 +54,7 @@ spec:
           properties:
             replicaCount: "[fromVariable(worker-count)]"     
       applicationScopes: 
-        - name: testNetworkScope2s
+        - name: testNetworkScope2
           type: core.hydra.io/v1alpha1.Network  
     - componentName: fireworks-worker
       instanceName: fireworks-worker2
