@@ -26,6 +26,4 @@ spec:
         value: http://+:80
       - name: OBJECTCOUNTER_MAX_COUNT_OUTPUT_LIMIT
         fromParam: objectcounter
-      image:
-        name: seabreeze/azure-mesh-fireworks-web:1.1-alpine
-        digest: sha256:6c3c624b58dbbcd3c0dd82b4c53f04194d1247c6eebdaab7c610cf7d66709b3b
+      image: seabreeze/azure-mesh-fireworks-web:1.1-alpine

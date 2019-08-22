@@ -18,9 +18,9 @@ spec:
     - name: web-count
       value: 1
     - name: worker-count
-      value: 3
+      value: 1
     - name: subnet_name_value 
-      value: /subscriptions/1520019f-4b18-4cd4-a84d-b931699b2e8e/resourceGroups/suhuruli-fireworks/providers/Microsoft.Network/virtualNetworks/suhuruli-vnet/subnets/hydra
+      value: /subscriptions/13ad2c84-84fa-4798-ad71-e70c07af873f/resourceGroups/suhuruli-fireworks/providers/Microsoft.Network/virtualNetworks/suhuruli-vnet/subnets/hydra
   scopes: 
     - name: testNetworkScope2
       type: core.hydra.io/v1alpha1.Network
@@ -34,8 +34,7 @@ spec:
         - name: objectcounter
           value: "[fromVariable(objectcounter)]"
       traits:
-        - name: web-scaler
-          type: core.hydra.io/v1alpha1.ManualScaler
+        - type: core.hydra.io/v1alpha1.ManualScaler
           properties:
             replicaCount: "[fromVariable(web-count)]"
       applicationScopes: 
@@ -49,40 +48,9 @@ spec:
         - name: object_counter_address
           value: "[fromVariable(objectcounteraddress)]"
       traits:
-        - name: worker-scaler
-          type: core.hydra.io/v1alpha1.ManualScaler
+        - type: core.hydra.io/v1alpha1.ManualScaler
           properties:
             replicaCount: "[fromVariable(worker-count)]"     
       applicationScopes: 
         - name: testNetworkScope2
           type: core.hydra.io/v1alpha1.Network  
-    - componentName: fireworks-worker
-      instanceName: fireworks-worker2
-      parameterValues: 
-        - name: firework_color
-          value: "[fromVariable(color2)]"
-        - name: object_counter_address
-          value: "[fromVariable(objectcounteraddress)]"            
-      traits:
-        - name: worker-scaler
-          type: core.hydra.io/v1alpha1.ManualScaler
-          properties:
-            replicaCount: "[fromVariable(worker-count)]"
-      applicationScopes: 
-        - name: testNetworkScope2
-          type: core.hydra.io/v1alpha1.Network
-    - componentName: fireworks-worker
-      instanceName: fireworks-worker3   
-      parameterValues: 
-        - name: firework_color
-          value: "[fromVariable(color3)]"  
-        - name: object_counter_address
-          value: "[fromVariable(objectcounteraddress)]"               
-      traits:
-        - name: worker-scaler
-          type: core.hydra.io/v1alpha1.ManualScaler
-          properties:
-            replicaCount: "[fromVariable(worker-count)]"
-      applicationScopes: 
-        - name: testNetworkScope2
-          type: core.hydra.io/v1alpha1.Network

@@ -168,7 +168,7 @@
                         }
                     }, 
                     {
-                        "name": "hydra-subnet",
+                        "name": "hydra",
                         "properties": {
                             "addressPrefix": "10.1.1.0/24",
                             "delegations": [
