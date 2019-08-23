@@ -173,8 +173,7 @@
                             "addressPrefix": "10.1.1.0/24",
                             "delegations": [
                                 {
-                                    "name" : "MeshDelegation",
-                                    "id": "string",
+                                    "name" : "Microsoft.ServiceFabricMesh/networks",
                                     "properties": {
                                         "serviceName": "Microsoft.ServiceFabricMesh/networks"
                                     }
