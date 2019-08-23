@@ -20,7 +20,7 @@ spec:
     - name: worker-count
       value: 1
     - name: subnet_name_value 
-      value: /subscriptions/13ad2c84-84fa-4798-ad71-e70c07af873f/resourceGroups/suhuruli-fireworks/providers/Microsoft.Network/virtualNetworks/suhuruli-vnet/subnets/hydra
+      value: /subscriptions/eec8e14e-b47d-40d9-8bd9-23ff5c381b40/resourceGroups/suhuruli-fireworks/providers/Microsoft.Network/virtualNetworks/suhuruli-vnet/subnets/hydra
   scopes: 
     - name: testNetworkScope2
       type: core.hydra.io/v1alpha1.Network
