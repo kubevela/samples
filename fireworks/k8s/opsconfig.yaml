@@ -1,0 +1,40 @@
+apiVersion: core.hydra.io/v1alpha1
+kind: Configuration
+metadata:
+    name: fireworks-deployment-config
+    description: Customized version of the fireworks components
+spec:
+  variables:
+    - name: objectcounter
+      value: 500
+    - name: color1
+      value: red
+    - name: color2 
+      value: green
+    - name: color3 
+      value: blue
+    - name: web-count
+      value: 1
+    - name: worker-count
+      value: 1
+  components:
+    - componentName: fireworks-frontend
+      instanceName: fireworks-frontend
+      parameterValues: 
+        - name: objectcounter
+          value: "[fromVariable(objectcounter)]"
+      traits:
+        - type: core.hydra.io/v1alpha1.ManualScaler
+          properties:
+            replicaCount: "[fromVariable(web-count)]"
+    - componentName: fireworks-worker
+      instanceName: fireworks-worker1
+      parameterValues: 
+        - name: firework_color
+          value: "[fromVariable(color1)]"
+        - name: object_counter_address
+          value: "[fromVariable(objectcounteraddress)]"
+      traits:
+        - type: core.hydra.io/v1alpha1.ManualScaler
+          properties:
+            replicaCount: "[fromVariable(worker-count)]"     
