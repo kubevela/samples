@@ -4,6 +4,8 @@ The application being deployed is shown in the following diagram:
 
 ![Application architecture diagram](service-tracker-diagram.jpg)
 
+> Full application original source here: https://github.com/chzbrgr71/service-tracker 
+
 In this example, there are various roles that handle each aspect of the Hydra application.
 
 * UI Developer
