@@ -1,0 +1,59 @@
+name: CI
+
+on: [push]
+
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: azure/container-actions/docker-login@master
+      with:
+        login-server: ${{ secrets.ACR_REGISTRY_NAME }}
+        username: ${{ secrets.ACR_REGISTRY_USERID }}
+        password: ${{ secrets.ACR_REGISTRY_PASSWORD }}
+
+    - run: |
+        docker build -f fireworks/src/worker/linux.v2.Dockerfile ./fireworks/src -t ${{ secrets.ACR_REGISTRY_NAME }}/azure-mesh-fireworks-worker-v1:${{ github.sha }}
+        docker push ${{ secrets.ACR_REGISTRY_NAME }}/azure-mesh-fireworks-worker-v1:${{ github.sha }}
+        docker build -f fireworks/src/web/linux.Dockerfile ./fireworks/src -t ${{ secrets.ACR_REGISTRY_NAME }}/azure-mesh-fireworks-web:${{ github.sha }}
+        docker push ${{ secrets.ACR_REGISTRY_NAME }}/azure-mesh-fireworks-web:${{ github.sha }}
+
+    - uses: sgreenmsft/yamlpackage@master
+      with:
+        manifests: |
+          fireworks/src/worker/manifests/component.yaml
+          fireworks/src/web/manifests/component.yaml
+          fireworks/src/manifests/operationalconfig.yaml
+        outputDirectory: manifests/output
+        images: |
+          ${{ secrets.ACR_REGISTRY_NAME }}/azure-mesh-fireworks-worker-v1:${{ github.sha }}
+          ${{ secrets.ACR_REGISTRY_NAME }}/azure-mesh-fireworks-web:${{ github.sha }}
+
+    - run: |
+        cat manifests/output/component.yaml
+        cat manifests/output/component1.yaml
+
+    - uses: azure/k8s-actions/aks-set-context@master
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+        resource-group: ${{ secrets.AKS_CLUSTER_RESOURCE_GROUP }}
+
+    - uses: azure/k8s-actions/k8s-create-secret@master
+      with:
+        container-registry-url: ${{ secrets.ACR_REGISTRY_NAME }}
+        container-registry-username: ${{ secrets.ACR_REGISTRY_USERID }}
+        container-registry-password: ${{ secrets.ACR_REGISTRY_PASSWORD }}
+        secret-name: scyllaimagepullsecret
+
+    - uses: azure/k8s-actions/k8s-deploy@master
+      with:
+        manifests: |
+          manifests/output/component.yaml
+          manifests/output/component1.yaml
+          manifests/output/operationalconfig.yaml
