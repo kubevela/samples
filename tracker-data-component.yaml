@@ -1,0 +1,45 @@
+apiVersion: core.oam.dev/v1alpha1
+kind: ComponentSchematic
+metadata:
+  name: data-api
+spec:
+  workloadType: core.oam.dev/v1alpha1.Server
+  osType: linux
+  arch: amd64
+  parameters:
+    - name: dbuser
+      description: mongo username
+      type: string
+      required: false
+    - name: dbpassword
+      description: mongo password
+      type: string
+      required: false
+    - name: dbipaddress
+      description: mongo IP address
+      type: string
+      required: false
+    - name: dbport
+      description: mongo port number
+      type: string
+      required: false            
+  containers:
+    - name: data-api
+      image: chzbrgr71/data-api:v1.1    
+      env:
+        - name: MONGODB_USER
+          value: "foo"
+          fromParam: "dbuser"
+        - name: MONGODB_PASSWORD
+          value: "foo"
+          fromParam: "dbpassword"
+        - name: MONGODB_IP
+          value: "foo"        
+          fromParam: dbipaddress
+        - name: MONGODB_PORT
+          value: "foo"        
+          fromParam: dbport    
+      ports:
+        - name: http
+          containerPort: 3009
+          protocol: TCP

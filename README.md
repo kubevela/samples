@@ -22,7 +22,10 @@ The Kubernetes cluster must have the Operator deployed. This can be found here: 
 
     ```
     kubectl apply -f tracker-db-component.yaml
-    kubectl apply -f tracker-api-components.yaml
+    kubectl apply -f tracker-data-component.yaml
+    kubectl apply -f tracker-flights-component.yaml
+    kubectl apply -f tracker-quakes-component.yaml
+    kubectl apply -f tracker-weather-component.yaml
     kubectl apply -f tracker-ui-component.yaml
     ```
 

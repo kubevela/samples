@@ -30,7 +30,10 @@ jobs:
     - uses: philliphoff/hydra-examples/.github/actions/yamlpackage@philliphoff-package-workflow
       with:
         manifests: |
-          tracker-api-components.yaml
+          tracker-data-component.yaml
+          tracker-flights-component.yaml
+          tracker-quakes-component.yaml
+          tracker-weather-component.yaml
           tracker-db-component.yaml
           tracker-ui-component.yaml
           tracker-app-config.yaml
