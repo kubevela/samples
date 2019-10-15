@@ -45,11 +45,11 @@ jobs:
           ${{ secrets.ACR_REGISTRY_NAME }}/service-tracker-ui:${{ github.sha }}
           ${{ secrets.ACR_REGISTRY_NAME }}/weather-api:${{ github.sha }}
     - run: |
-        cat manifests/output/component.yaml
-        cat manifests/output/component1.yaml
-        cat manifests/output/component2.yaml
-        cat manifests/output/component3.yaml
-        cat manifests/output/component4.yaml
+        cat manifests/output/tracker-data-component.yaml
+        cat manifests/output/tracker-flights-component.yaml
+        cat manifests/output/tracker-quakes-component.yaml
+        cat manifests/output/tracker-weather-component.yaml
+        cat manifests/output/tracker-ui-component.yaml
     - uses: azure/k8s-actions/aks-set-context@master
       with:
         creds: '${{ secrets.AZURE_CREDENTIALS }}'
@@ -66,10 +66,10 @@ jobs:
     - uses: azure/k8s-actions/k8s-deploy@master
       with:
         manifests: |
-          manifests/output/component.yaml
-          manifests/output/component1.yaml
-          manifests/output/component2.yaml
-          manifests/output/component3.yaml
-          manifests/output/component4.yaml
+          manifests/output/tracker-data-component.yaml
+          manifests/output/tracker-flights-component.yaml
+          manifests/output/tracker-quakes-component.yaml
+          manifests/output/tracker-weather-component.yaml
+          manifests/output/tracker-ui-component.yaml
           manifests/output/tracker-db-component.yaml
           manifests/output/tracker-app-config.yaml
