@@ -27,7 +27,7 @@ jobs:
         docker push ${{ secrets.ACR_REGISTRY_NAME }}/service-tracker-ui:${{ github.sha }}
         docker build -f app/weather-api/Dockerfile ./app/weather-api -t ${{ secrets.ACR_REGISTRY_NAME }}/weather-api:${{ github.sha }}
         docker push ${{ secrets.ACR_REGISTRY_NAME }}/weather-api:${{ github.sha }}
-    - uses: philliphoff/hydra-examples/.github/actions/yamlpackage@philliphoff-package-workflow
+    - uses: .github/actions/yamlpackage@master
       with:
         manifests: |
           tracker-data-component.yaml
