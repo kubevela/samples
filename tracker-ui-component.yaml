@@ -1,9 +1,9 @@
-apiVersion: core.hydra.io/v1alpha1
+apiVersion: core.oam.dev/v1alpha1
 kind: ComponentSchematic
 metadata:
   name: service-tracker-ui
 spec:
-  workloadType: core.hydra.io/v1alpha1.Server
+  workloadType: core.oam.dev/v1alpha1.Server
   osType: linux
   arch: amd64
   parameters:
