@@ -1,0 +1,75 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: azure/container-actions/docker-login@master
+      with:
+        login-server: ${{ secrets.ACR_REGISTRY_NAME }}
+        username: ${{ secrets.ACR_REGISTRY_USERID }}
+        password: ${{ secrets.ACR_REGISTRY_PASSWORD }}
+
+    - run: |
+        docker build -f app/data-api/Dockerfile ./app/data-api -t ${{ secrets.ACR_REGISTRY_NAME }}/data-api:${{ github.sha }}
+        docker push ${{ secrets.ACR_REGISTRY_NAME }}/data-api:${{ github.sha }}
+        docker build -f app/flights-api/Dockerfile ./app/flights-api -t ${{ secrets.ACR_REGISTRY_NAME }}/flights-api:${{ github.sha }}
+        docker push ${{ secrets.ACR_REGISTRY_NAME }}/flights-api:${{ github.sha }}
+        docker build -f app/quakes-api/Dockerfile ./app/quakes-api -t ${{ secrets.ACR_REGISTRY_NAME }}/quakes-api:${{ github.sha }}
+        docker push ${{ secrets.ACR_REGISTRY_NAME }}/quakes-api:${{ github.sha }}
+        docker build -f app/service-tracker-ui/Dockerfile ./app/service-tracker-ui -t ${{ secrets.ACR_REGISTRY_NAME }}/service-tracker-ui:${{ github.sha }}
+        docker push ${{ secrets.ACR_REGISTRY_NAME }}/service-tracker-ui:${{ github.sha }}
+        docker build -f app/weather-api/Dockerfile ./app/weather-api -t ${{ secrets.ACR_REGISTRY_NAME }}/weather-api:${{ github.sha }}
+        docker push ${{ secrets.ACR_REGISTRY_NAME }}/weather-api:${{ github.sha }}
+    - uses: ./.github/actions/yamlpackage
+      with:
+        manifests: |
+          tracker-data-component.yaml
+          tracker-flights-component.yaml
+          tracker-quakes-component.yaml
+          tracker-weather-component.yaml
+          tracker-db-component.yaml
+          tracker-ui-component.yaml
+          tracker-app-config.yaml
+        outputDirectory: manifests/output
+        images: |
+          ${{ secrets.ACR_REGISTRY_NAME }}/data-api:${{ github.sha }}
+          ${{ secrets.ACR_REGISTRY_NAME }}/flights-api:${{ github.sha }}
+          ${{ secrets.ACR_REGISTRY_NAME }}/quakes-api:${{ github.sha }}
+          ${{ secrets.ACR_REGISTRY_NAME }}/service-tracker-ui:${{ github.sha }}
+          ${{ secrets.ACR_REGISTRY_NAME }}/weather-api:${{ github.sha }}
+    - run: |
+        cat manifests/output/tracker-data-component.yaml
+        cat manifests/output/tracker-flights-component.yaml
+        cat manifests/output/tracker-quakes-component.yaml
+        cat manifests/output/tracker-weather-component.yaml
+        cat manifests/output/tracker-ui-component.yaml
+    - uses: azure/k8s-actions/aks-set-context@master
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ secrets.AKS_CLUSTER_NAME }}
+        resource-group: ${{ secrets.AKS_CLUSTER_RESOURCE_GROUP }}
+
+    - uses: azure/k8s-actions/k8s-create-secret@master
+      with:
+        container-registry-url: ${{ secrets.ACR_REGISTRY_NAME }}
+        container-registry-username: ${{ secrets.ACR_REGISTRY_USERID }}
+        container-registry-password: ${{ secrets.ACR_REGISTRY_PASSWORD }}
+        secret-name: rudrimagepullsecret
+
+    - uses: azure/k8s-actions/k8s-deploy@master
+      with:
+        manifests: |
+          manifests/output/tracker-data-component.yaml
+          manifests/output/tracker-flights-component.yaml
+          manifests/output/tracker-quakes-component.yaml
+          manifests/output/tracker-weather-component.yaml
+          manifests/output/tracker-ui-component.yaml
+          manifests/output/tracker-db-component.yaml
+          manifests/output/tracker-app-config.yaml
