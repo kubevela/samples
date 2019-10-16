@@ -1,11 +1,33 @@
-# Hydra Examples 
+## Service Tracker Example
 
-This repository contains examples of how developers and app operators can work together to build an application and then deploy it to a Hydra implementation. 
+This is an example microservices application with a Javascript Web UI, a MongoDB database, and a series of API microservices. The idea is that various app developers would create Components for their corresponding apps. The overall config will add traits and allow the app to be fully deployed. 
+The application being deployed is shown in the following diagram: 
 
-## Table of Contents 
+![Application architecture diagram](service-tracker-diagram.jpg)
 
-1. Fireworks - The fireworks is the simplest example containing a single web frontend that is polled by the worker components. The worker components provide the color of the firework and the web frontend is responsible for displaying this. This example goes over how two separate developers can independently work on these microservices and then the application operator can deploy the whole application into an existing VNET, provide public ingress and define autoscaling rules independent of the developers getting involved. 
+> Full application original source here: https://github.com/chzbrgr71/service-tracker 
 
-    There is a focus on how developers build microservices, test and then hand off the package to the app operators. The application operators are in charge of their CI/CD pipelines using existing Hydra APIs.
+In this example, there are various roles that handle each aspect of the OAM application.
 
-2. [Service Tracker](service-tracker/README.md) - This is an example microservices application with a Javascript Web UI, a MongoDB database, and a series of API microservices. The idea is that various app developers would create Components for their corresponding apps. The overall config will add traits and allow the app to be fully deployed. 
+* UI Developer
+* API Microservices Developer
+* MongoDB Admin
+* App Operator / SRE (handles applicaiton deployment in Kubernetes)
+
+### Deploying to Kubernetes
+
+The Kubernetes cluster must have the Operator deployed. This can be found here: https://github.com/oam-dev/rudr 
+
+1. Once rudr is installed in the cluster, first add the `ComponentSchematics`
+
+    ```
+    kubectl apply -f tracker-db-component.yaml
+    kubectl apply -f tracker-api-components.yaml
+    kubectl apply -f tracker-ui-component.yaml
+    ```
+
+2. Then install the `AppConfiguration`
+
+    ```
+    kubectl create -f tracker-app-config.yaml
+    ```
