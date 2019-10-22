@@ -12,7 +12,9 @@ spec:
       - name: dbpassword
         value: dbpassword
       - name: rootpassword
-        value: adminpassword    
+        value: adminpassword
+      - name: database
+        value: hackfest     
   - name: data-api
     instanceName: data-api
     parameterValues:
@@ -21,9 +23,11 @@ spec:
       - name: dbpassword
         value: "dbpassword"
       - name: dbipaddress
-        value: "mongodb"
+        value: "mongodb.default.svc.cluster.local"
       - name: dbport
-        value: "27017"       
+        value: "27017"
+      - name: database
+        value: "hackfest"       
   - name: flights-api
     instanceName: flights-api
     parameterValues:

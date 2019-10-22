@@ -18,20 +18,27 @@ spec:
     - name: rootpassword
       description: mongo root password
       type: string
-      required: false               
+      required: false
+    - name: database
+      description: new database
+      type: string
+      required: false                 
   containers:
-    - name: mongo-db
-      image: docker.io/bitnami/mongodb:4.0.10-debian-9-r39     
+    - name: mongodb
+      image: docker.io/bitnami/mongodb:4.0.10-debian-9-r39   
       env:
         - name: MONGODB_USERNAME
-          value: "foo"
+          value: "dbuser"
           fromParam: "dbuser"
         - name: MONGODB_PASSWORD
-          value: "foo"
+          value: "dbpassword"
           fromParam: "dbpassword"   
         - name: MONGODB_ROOT_PASSWORD
-          value: "foo"       
+          value: "dbpassword"       
           fromParam: "rootpassword"
+        - name: MONGODB_DATABASE
+          value: "hackfest"       
+          fromParam: "database"
       ports:
         - name: mongodb
           containerPort: 27017
