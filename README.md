@@ -14,11 +14,19 @@ In this example, there are various roles that handle each aspect of the OAM appl
 * MongoDB Admin
 * App Operator / SRE (handles applicaiton deployment in Kubernetes)
 
-### Deploying to Kubernetes
+## Quickstart: Deploy the sample to Rudr running on any Kubernetes cluster
 
-The Kubernetes cluster must have the Operator deployed. This can be found here: https://github.com/oam-dev/rudr 
+### Pre-requisites 
 
-1. Once rudr is installed in the cluster, first add the `ComponentSchematics`
+* Follow the **Prerequisites** section in the [Rudr Installation guide](https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md) to install Helm 3, kubectl and get a Kubernetes cluster up.  
+
+### Set up the cluster
+
+1. Install Rudr and an Ingress controller on your Kubernetes cluster. Follow instructions here: https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md making sure to also install the NGINX Ingress Controller. 
+
+### Install the application
+
+1. Add the `ComponentSchematics` to the K8s cluster. 
 
     ```
     kubectl apply -f tracker-db-component.yaml
@@ -29,46 +37,24 @@ The Kubernetes cluster must have the Operator deployed. This can be found here: 
     kubectl apply -f tracker-ui-component.yaml
     ```
 
-2. Then install the `AppConfiguration`
+2. Install the `AppConfiguration`.
 
     ```
     kubectl create -f tracker-app-config.yaml
     ```
 
-### Continuous Integration with GitHub Actions
+3. Run `kubectl get svc` to obtain the external IP to the NGINX controller. It will look like the below.    
 
-Continuous Integration (CI) automation for an OAM application is similar to other Kubernetes CI automation.  The typical process builds a Docker image for each application component, pushes the image to a repository, updates each component configuration to reference the newly pushed image, and applies the updated configuration to the Kubernetes cluster.
-
-This repo includes an example of CI automation using GitHub workflows and actions. The repo includes a custom GitHub Action, `yamlpackage` used by the workflow to perform the update of the Docker image reference for each application component.
-
-The workflow runs automatically on each push to this GitHub repo (or fork of this repo).  However, the workflow will not be successful until it has been configured for a specific Docker repository and Kubernetes cluster.
-
-#### Cloud Setup
-
-The workflow expects both a private Docker repository (e.g. ACR) to push images to as well as an AKS cluster to deploy the components to.
-
-#### Component Setup
-
-The workflow assumes images will be pushed to a private Docker repository; the workflow creates the Kubernetes secret (named `rudrimagepullsecret`) used to authenticate against the repository but the component schematics must be updated to use that pull secret (as, by default, the sample pulls images from a public repository).
-
-Add the `imagePullSecret` property to each of the `data`/`flights`/`quakes`/`weather`/`ui` component YAML files:
-
-  ```yaml
-    containers:
-    - name: <existing name>
-      image: <existing image>
-      imagePullSecret: rudrimagepullsecret
+  ```bash
+  nginx-ingress-controller        LoadBalancer   10.0.253.208   13.64.241.76   80:32751/TCP,443:30402/TCP   28h
   ```
 
-#### Secrets Setup
+4. Add the following to your `/etc/hosts` file so you can access the endpoint using the host (servicetracker.oam.io). 
 
-The workflow expects several secrets to be set within this repo (or fork of this repo):
+    ```
+    13.64.241.76 servicetracker.oam.io
+    ``` 
 
-  | Secret | Description |
-  |--------|-------------|
-  | ACR_REGISTRY_NAME | The hostname of the Docker registry |
-  | ACR_REGISTRY_USERID | The user ID for authenticating with the Docker registry |
-  | ACR_REGISTRY_PASSWORD | The password for authenticating with the Docker registry |
-  | AZURE_CREDENTIALS | The credentials used to authenticate with the AKS cluster (see the [aks-set-context](https://github.com/Azure/k8s-actions/tree/master/aks-set-context#azure-credentials) GitHub action guide for details) |
-  | AKS_CLUSTER_NAME | The name of the AKS cluster |
-  | AKS_CLUSTER_RESOURCE_GROUP | The resource group in which the AKS cluster resides |
+5. Visit your browser and type in `servicetracker.oam.io` for the Service Tracker Website. 
+
+For instructions on how to demo this content with GitHub Actions please read the instructions on the [GitHub Actions Demo](./DEMO.md).
