@@ -38,8 +38,9 @@ There is one UI microservice, four API microservices and one Mongo DB admin. Eac
 * The workloadType which dictates how the microservice is supposed to run. In this example, all are of type `Server` indicating multiple replicas can exist. 
 * The container image and credentials. Developers are responsible at the very least for authoring the Dockerfiles containing the dependencies in order to build their runnable container. This example also expects an image to be pushed to a registry although this can be handled by a continuous integration system. 
 * Container ports that expose any ports that servers are listening to. 
+* Parameters that can be overriden by an operator at time of instiation 
 
-2. Add the `ComponentSchematics` to the K8s cluster. The below commands register the API microservices, UI and the MongoDB to the Kubernetes cluster. At this point, nothing is running but available for instantiation.  
+2. Add the `ComponentSchematics` to the K8s cluster. The below commands register the API microservices, UI and the MongoDB to the Kubernetes cluster. At this point, nothing is running but available for instantiation by the operator.  
 
     ```
     kubectl apply -f tracker-db-component.yaml
@@ -54,7 +55,7 @@ There is one UI microservice, four API microservices and one Mongo DB admin. Eac
 
 The application operator (this may or may not be different than the developer) tasks involve running the application with appropriate configurations. 
 
-1. The **OAM Application Configuration** instantiates each of the components and requires the following knowledge from the operator: 
+1. This **OAM ApplicationConfiguration** instantiates each of the components and allows the operator to tune the following: 
 
 * Number of replicas for each component 
 * Ingress properties such as hostname, routing rules, exposed port. The implementation of the Ingress (in this case NGINX) is not of concern 
