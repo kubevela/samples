@@ -16,17 +16,30 @@ In this example, there are various roles that handle each aspect of the OAM appl
 
 ## Quickstart: Deploy the sample to Rudr running on any Kubernetes cluster
 
-### Pre-requisites 
+### Pre-requisites for this sample
 
-* Follow the **Prerequisites** section in the [Rudr Installation guide](https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md) to install Helm 3, kubectl and get a Kubernetes cluster up.  
+* [Install Helm 3](https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md#prerequisites)
+* [Install kubectl](https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md#prerequisites)
+* A running Kubernetes cluster.
 
-### Set up the cluster
+### Infrastructure Operator:  Install Rudr and an Ingress controller
 
-1. Install Rudr and an Ingress controller on your Kubernetes cluster. Follow instructions here: https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md making sure to also install the NGINX Ingress Controller. 
+As an infrastructure operator, the Kubernetes cluster is going to be set up with Rudr and NGINX as the Ingress controller. 
 
-### Install the application
+* [Install Rudr](https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md#installing-rudr-using-helm-3) on your cluster.
+* [Install the NGINX Controller](https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md#ingress) on your cluster.
 
-1. Add the `ComponentSchematics` to the K8s cluster. 
+### Application Developer: Authoring and registering component schematics 
+
+There is one UI microservice, four API microservices and one Mongo DB admin. Each team is responsible for delivering the component schematic for their microservice. 
+
+1. The **OAM Component Schematics** that will be applied to the Kubernetes cluster require the following knowledge from the developers: 
+
+* The workloadType which dictates how the microservice is supposed to run. In this example, all are of type `Server` indicating multiple replicas can exist. 
+* The container image and credentials. Developers are responsible at the very least for authoring the Dockerfiles containing the dependencies in order to build their runnable container. This example also expects an image to be pushed to a registry although this can be handled by a continuous integration system. 
+* Container ports that expose any ports that servers are listening to. 
+
+2. Add the `ComponentSchematics` to the K8s cluster. The below commands register the API microservices, UI and the MongoDB to the Kubernetes cluster. At this point, nothing is running but available for instantiation.  
 
     ```
     kubectl apply -f tracker-db-component.yaml
@@ -37,11 +50,29 @@ In this example, there are various roles that handle each aspect of the OAM appl
     kubectl apply -f tracker-ui-component.yaml
     ```
 
-2. Install the `AppConfiguration`.
+### Application Operator: Instantiate application with appropriate configuration
+
+The application operator (this may or may not be different than the developer) tasks involve running the application with appropriate configurations. 
+
+1. The **OAM Application Configuration** instantiates each of the components and requires the following knowledge from the operator: 
+
+* Number of replicas for each component 
+* Ingress properties such as hostname, routing rules, exposed port. The implementation of the Ingress (in this case NGINX) is not of concern 
+* Values for any parameters that can be overriden in the components. 
+
+2. Install the `ApplicationConfiguration`.
 
     ```
     kubectl create -f tracker-app-config.yaml
     ```
+
+With Rudr, instantiating an `ApplicationConfiguration` does the following: 
+
+* Starts pods 
+* Instantiates Services with appropriate configurations 
+* Creates the Ingress resource with the rules 
+
+The OAM specification allows developers to describe their application and Rudr takes care of translating and managing the OAM specification into Kubernetes definitions. 
 
 3. Run `kubectl get svc` to obtain the external IP to the NGINX controller. It will look like the below.    
 
@@ -55,6 +86,10 @@ In this example, there are various roles that handle each aspect of the OAM appl
     13.64.241.76 servicetracker.oam.io
     ``` 
 
-5. Visit your browser and type in `servicetracker.oam.io` for the Service Tracker Website. 
+5. Visit your browser and type in `servicetracker.oam.io` for the Service Tracker website. Refresh the data on the dashboard for each of the microservices. 
 
-For instructions on how to demo this content with GitHub Actions please read the instructions on the [GitHub Actions Demo](./DEMO.md).
+![Dashboard picture](dashboard.png)
+
+6. Once the data is refreshed, hitting the **Flights**, **Earthquakes** or **Weather** tabs on the left, will provide up-to-date information. 
+
+![flights picture](flights.png)
