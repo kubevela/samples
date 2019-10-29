@@ -13,7 +13,7 @@ spec:
       required: true           
   containers:
     - name: flights-api
-      image: chzbrgr71/flights-api:v1.1    
+      image: sonofjorel/rudr-flights-api:0.49   
       env:
         - name: DATA_SERVICE_URI
           value: "foo"

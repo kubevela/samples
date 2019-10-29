@@ -13,7 +13,7 @@ spec:
       required: true           
   containers:
     - name: weather-api
-      image: chzbrgr71/weather-api:v1.1    
+      image: sonofjorel/rudr-weather-api:0.49    
       env:
         - name: DATA_SERVICE_URI
           value: "foo"

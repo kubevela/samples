@@ -13,7 +13,7 @@ spec:
       required: true           
   containers:
     - name: quakes-api
-      image: chzbrgr71/quakes-api:v1.1    
+      image: sonofjorel/rudr-quakes-api:0.49   
       env:
         - name: DATA_SERVICE_URI
           value: "foo"
