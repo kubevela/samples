@@ -114,7 +114,10 @@ function tryConnection(){
         reconnectTries : 10, 
         reconnectInterval : 3000 
       }
-    );
+    ).catch(err => {
+      console.error(`ERROR :: CONNECTION TO DATABASE FAILED - KILLING PROCESS`);
+      process.exit(16);
+    });
   } else {
     mongoose.connect(
       'mongodb://localhost/demo:27017',
