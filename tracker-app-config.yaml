@@ -71,7 +71,7 @@ spec:
       - name: ingress
         parameterValues:
           - name: hostname
-            value: oam.servicetracker.io
+            value: servicetracker.oam.io
           - name: path
             value: / 
           - name: service_port
