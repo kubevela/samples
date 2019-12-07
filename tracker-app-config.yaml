@@ -4,7 +4,7 @@ metadata:
   name: service-tracker
 spec:
   components:
-  - name: tracker-mongo-db
+  - componentName: tracker-mongo-db
     instanceName: mongodb
     parameterValues:
       - name: dbuser
@@ -15,7 +15,7 @@ spec:
         value: adminpassword
       - name: database
         value: hackfest     
-  - name: data-api
+  - componentName: data-api
     instanceName: data-api
     parameterValues:
       - name: dbuser
@@ -28,7 +28,7 @@ spec:
         value: "27017"
       - name: database
         value: "hackfest"       
-  - name: flights-api
+  - componentName: flights-api
     instanceName: flights-api
     parameterValues:
       - name: dataUri
@@ -38,7 +38,7 @@ spec:
         parameterValues:
           - name: replicaCount
             value: 2   
-  - name: quakes-api
+  - componentName: quakes-api
     instanceName: quakes-api
     parameterValues:
       - name: dataUri
@@ -48,7 +48,7 @@ spec:
         parameterValues:
           - name: replicaCount
             value: 2       
-  - name: weather-api
+  - componentName: weather-api
     instanceName: weather-api
     parameterValues:
       - name: dataUri
@@ -58,7 +58,7 @@ spec:
         parameterValues:
           - name: replicaCount
             value: 2        
-  - name: service-tracker-ui
+  - componentName: service-tracker-ui
     instanceName: service-tracker-ui
     parameterValues:
       - name: flightsUri
