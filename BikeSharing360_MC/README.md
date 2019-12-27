@@ -8,7 +8,7 @@ BikeSharing 360 for single containers can be found [here](../BikeSharing360_SC).
 
 # Building the project
 
-Make sure that the ingress controller has been installed (instructions [here](../../docs/setup/install.md)).
+Make sure that the ingress controller has been installed (instructions [here](https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md)).
 
 Add the components:
 
