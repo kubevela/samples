@@ -1,0 +1,22 @@
+apiVersion: core.oam.dev/v1alpha1
+kind: ApplicationConfiguration
+metadata:
+  name: bikesharing-app
+spec:
+  components:
+    - componentName: bikesharing-ui-v1
+      instanceName: bikesharing-ui
+      traits:
+        - name: ingress
+          parameterValues:
+            - name: hostname
+              value: bikesharing.com
+            - name: path
+              value: /
+    - componentName: bikesharing-email-api-v1
+      instanceName: bikesharing-email-api     
+    - componentName: bikesharing-feedback-api-v1
+      instanceName: bikesharing-feedback-api     
+    - componentName: bikesharing-profile-api-v1
+      instanceName: bikesharing-profile-api
+     
