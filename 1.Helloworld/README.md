@@ -68,7 +68,7 @@ spec:
       default: '9999'
 ```
 
-Let's name it `helloworld-python-component.yaml` and put it into [the `examples` folder](./ComponentSchematics/helloworld-python-component.yaml).
+Let's name it `helloworld-python-component.yaml` and put it into [the `examples` folder](./ComponentSchematic/helloworld-python-component.yaml).
 
 Finally we could apply this yaml to the platform and let our operators to deploy it.
 
