@@ -70,7 +70,7 @@ spec:
     traits:
       - name: ingress
         properties:
-          hostname: oam.servicetracker.io
+          hostname: servicetracker.oam.io
           path: /
           servicePort: 8080
           
