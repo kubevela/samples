@@ -13,10 +13,10 @@ Make sure that the ingress controller has been installed (instructions [here](ht
 Add the components:
 
 ```
-> kubectl apply -f BikeSharing.Campaign/Manifest/bikesharing-ui-component.yaml
-> kubectl apply -f Email.Api/Manifest/bikesharing-email-api-component.yaml
-> kubectl apply -f Feedback.Api/Manifest/bikesharing-feedback-api-component.yaml
-> kubectl apply -f Profile.Api/Manifest/bikesharing-profile-api-component.yaml
+> kubectl apply -f ComponentSchematic/bikesharing-ui-component.yaml
+> kubectl apply -f ComponentSchematic/bikesharing-email-api-component.yaml
+> kubectl apply -f ComponentSchematic/bikesharing-feedback-api-component.yaml
+> kubectl apply -f ComponentSchematic/bikesharing-profile-api-component.yaml
 ```
 
 Validate that the components were created successfully:
