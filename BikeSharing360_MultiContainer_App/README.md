@@ -52,9 +52,6 @@ Wait for ingress to be created:
 > kubectl get ingress
 
 NAME                                     HOSTS             ADDRESS   PORTS   AGE
-bikesharing-email-api-trait-ingress      bikesharing.com             80      2s
-bikesharing-feedback-api-trait-ingress   bikesharing.com             80      2s
-bikesharing-profile-api-trait-ingress    bikesharing.com             80      1s
 bikesharing-ui-trait-ingress             bikesharing.com             80      2s
 ```
 
