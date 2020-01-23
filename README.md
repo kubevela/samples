@@ -10,10 +10,11 @@ Rudr is currently under community development with preview releases.  The master
 
 | Sample                   | Description                                                                                                                                                                                    |
 |--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [1.hello-world](./1.hello-world)            | Demonstrates how to run Dapr locally. Highlights service invocation and state management.                                                                                                      |
-| [2.hello-kubernetes](./2.hello-kubernetes)       | Demonstrates how to run Dapr in Kubernetes. Highlights service invocation and state management.                                                                                                |
-| [3.distributed-calculator](./3.distributed-calculator) | Demonstrates a distributed calculator application that uses Dapr services to power a React web app. Highlights polyglot (multi-language) programming, service invocation and state management. |
+| [1. hello-world](./1.Helloworld)            | Demonstrates how to create simple component and configuration for a python application.                                                                                                      |
+| [2. ServiceTracker App](./2.hello-kubernetes)       | This is an example microservices application with a Javascript Web UI, a MongoDB database, and a series of API microservices. The idea is that various app developers would create Components for their corresponding apps. The overall config will add traits and allow the app to be fully deployed                                                                                                |
+| [3. BikeSharing 360 Multi Container App](./3.BikeSharing360_MultiContainer_App) | This is an example microservices application with an ASP.NET Core Webform UI,  and a series of API microservices. The idea is that various app developers would create Components for their corresponding apps. The overall config will add traits and allow the app to be fully deployed |
 
+| [4. BikeSharing 360 Single Container App](./4.BikeSharing360_SingleContainer_App) | Demonstrates Rudr implementation of BikeSharing 360 app created in a Single Container |
 
 To get started with the samples, clone this repository and follow instructions in each sample:
 ```bash
