@@ -6,7 +6,7 @@ BikeSharing360 is a fictitious example of a smart bike sharing system with 10,00
 
 BikeSharing 360 for multiple containers can be found [here](https://github.com/Microsoft/BikeSharing360_MultiContainer).
 
-## Deploy and Inspect with Rudr
+## Deploying the App to Kubernetes cluster (done by an Application Operator)
 
 ### Setting Up
 
