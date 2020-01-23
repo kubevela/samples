@@ -1,4 +1,4 @@
-# Rudr Samples
+## Rudr Samples
 
 This repository contains a series of samples that implemented with Rudr. Each subsequent sample includes instructions for installing the application using Rudr.
 
