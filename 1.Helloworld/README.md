@@ -68,12 +68,12 @@ spec:
       default: '9999'
 ```
 
-Let's name it `helloworld-python-component.yaml` and put it into [the `examples` folder](../../examples/helloworld-python-component.yaml).
+Let's name it `helloworld-python-component.yaml` and put it into [the `examples` folder](./ComponentSchematics/helloworld-python-component.yaml).
 
 Finally we could apply this yaml to the platform and let our operators to deploy it.
 
 ```shell script
-$ kubectl apply -f examples/helloworld-python-component.yaml
+$ kubectl apply -f ComponentSchematics/helloworld-python-component.yaml
 componentschematic.core.oam.dev/helloworld-python-v1 created
 ```
 
@@ -174,4 +174,4 @@ helloworld-python-v1   1h
 helloworld-python-v2   27s
 ```
 
-They could be used by operator in application configuration.  
+They could be used by operator in application configuration. A sample ApplicationConfiguration is given [here](./ApplicationConfiguration/ApplicationConfiguration.yaml).
