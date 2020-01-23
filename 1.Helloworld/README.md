@@ -174,4 +174,4 @@ helloworld-python-v1   1h
 helloworld-python-v2   27s
 ```
 
-They could be used by operator in application configuration. A sample ApplicationConfiguration is given [here](./ApplicationConfiguration/ApplicationConfiguration.yaml).
+They could be used by operator in application configuration. A sample ApplicationConfiguration is given [here](./ApplicationConfiguration/ApplicationConfiguration.yaml) with an ingress trait.
