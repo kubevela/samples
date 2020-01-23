@@ -2,7 +2,7 @@
 
 This repository contains a series of samples that implemented with Rudr. Each subsequent sample includes instructions for installing the application using Rudr.
 
-## Supported Dapr Runtime version
+## Supported Rudr Runtime version(s)
 
 Rudr is currently under community development with preview releases.  The master branch includes breaking changes, therefore ensure that you're running the samples with the right version of Rudr runtime. Samples in this repo is been tested with the current latest version of rudr - (rudr-0.1.0). Please install rudr as per the instructions [here (https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md)]
 
@@ -17,5 +17,5 @@ Rudr is currently under community development with preview releases.  The master
 
 To get started with the samples, clone this repository and follow instructions in each sample:
 ```bash
-git clone https://github.com/dapr/samples.git
+git clone https://github.com/oam-dev/samples.git
 ```
