@@ -69,10 +69,8 @@ spec:
         value: "http://quakes-api.default.svc.cluster.local:3012/"
     traits:
       - name: ingress
-        parameterValues:
-          - name: hostname
-            value: oam.servicetracker.io
-          - name: path
-            value: / 
-          - name: service_port
-            value: 8080       
+        properties:
+          hostname: oam.servicetracker.io
+          path: /
+          servicePort: 8080
+          

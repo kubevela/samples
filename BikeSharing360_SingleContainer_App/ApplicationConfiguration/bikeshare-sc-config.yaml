@@ -8,10 +8,7 @@ spec:
       instanceName: bikesharing-app-v1
       traits:
         - name: ingress
-          parameterValues:
-            - name: hostname
-              value: bikesharing.com
-            - name: path
-              value: /
-            - name: service_port
-              value: 80
+          properties:
+            hostname: bikesharing-sc.com
+            path: /
+            servicePort: 80
