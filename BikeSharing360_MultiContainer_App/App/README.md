@@ -4,7 +4,7 @@
 
 BikeSharing360 is a fictitious example of a smart bike sharing system with 10,000 bikes distributed in 650 stations located throughout New York City and Seattle. Their vision is to provide a modern and personalized experience to riders and to run their business with intelligence.
 
-BikeSharing 360 for single containers can be found [here](../BikeSharing360_SC).
+BikeSharing 360 for single containers can be found [here](../BikeSharing360_SingleContainer_App).
 
 # Building the project
 
@@ -13,10 +13,10 @@ Make sure that the ingress controller has been installed (instructions [here](ht
 Add the components:
 
 ```
-> kubectl apply -f BikeSharing.Campaign/Manifest/bikesharing-ui-component.yaml
-> kubectl apply -f Email.Api/Manifest/bikesharing-email-api-component.yaml
-> kubectl apply -f Feedback.Api/Manifest/bikesharing-feedback-api-component.yaml
-> kubectl apply -f Profile.Api/Manifest/bikesharing-profile-api-component.yaml
+> kubectl apply -f ComponentSchematic/bikesharing-ui-component.yaml
+> kubectl apply -f ComponentSchematic/bikesharing-email-api-component.yaml
+> kubectl apply -f ComponentSchematic/bikesharing-feedback-api-component.yaml
+> kubectl apply -f ComponentSchematic/bikesharing-profile-api-component.yaml
 ```
 
 Validate that the components were created successfully:
@@ -52,9 +52,6 @@ Wait for ingress to be created:
 > kubectl get ingress
 
 NAME                                     HOSTS             ADDRESS   PORTS   AGE
-bikesharing-email-api-trait-ingress      bikesharing.com             80      2s
-bikesharing-feedback-api-trait-ingress   bikesharing.com             80      2s
-bikesharing-profile-api-trait-ingress    bikesharing.com             80      1s
 bikesharing-ui-trait-ingress             bikesharing.com             80      2s
 ```
 
