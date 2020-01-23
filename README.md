@@ -1,10 +1,10 @@
 ## Rudr Samples
 
-This repository contains a series of samples that implemented with Rudr. Each subsequent sample includes instructions for installing the application using Rudr. Highly recommend to understand the concepts [here (https://github.com/oam-dev/rudr/tree/master/docs#get-started)]  first
+This repository contains a series of samples that implemented with Rudr. Each subsequent sample includes instructions for installing the application using Rudr. Highly recommend to understand the concepts [here](https://github.com/oam-dev/rudr/tree/master/docs#get-started)  first.
 
 ## Supported Rudr Runtime version(s)
 
-Rudr is currently under community development with preview releases.  The master branch includes breaking changes, therefore ensure that you're running the samples with the right version of Rudr runtime. Samples in this repo is been tested with the current latest version of rudr : (rudr-0.1.0). Please install rudr as per the instructions [here (https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md)]
+Rudr is currently under community development with preview releases.  The master branch includes breaking changes, therefore ensure that you're running the samples with the right version of Rudr runtime. Samples in this repo is been tested with the current latest version of rudr : (rudr-0.1.0). Please install rudr as per the instructions [here](https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md)
 
 ## Samples
 
