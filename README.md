@@ -1,6 +1,6 @@
 ## Rudr Samples
 
-This repository contains a series of samples that implemented with Rudr. Each subsequent sample includes instructions for installing the application using Rudr.
+This repository contains a series of samples that implemented with Rudr. Each subsequent sample includes instructions for installing the application using Rudr. Highly recommend to understand the concepts [here (https://github.com/oam-dev/rudr/tree/master/docs#get-started)]  first
 
 ## Supported Rudr Runtime version(s)
 
