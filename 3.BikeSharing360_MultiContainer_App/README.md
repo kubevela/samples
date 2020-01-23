@@ -6,7 +6,7 @@ BikeSharing360 is a fictitious example of a smart bike sharing system with 10,00
 
 BikeSharing 360 for single containers can be found [here](../4.BikeSharing360_SingleContainer_App).
 
-# Deploying the App to Kubernetes cluster by An Application Operator
+# Deploying the App to Kubernetes cluster (done by an Application Operator)
 
 Make sure that the ingress controller has been installed (instructions [here](https://github.com/oam-dev/rudr/blob/master/docs/setup/install.md)).
 
