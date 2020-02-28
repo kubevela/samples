@@ -75,4 +75,4 @@ spec:
           - name: path
             value: / 
           - name: service_port
-            value: 8080       
+            value: 8080
