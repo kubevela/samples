@@ -1,22 +1,18 @@
 apiVersion: core.oam.dev/v1alpha1
 kind: ComponentSchematic
 metadata:
-  name: tracker-mongo-db
+  name: tracker-postgres-db
 spec:
   workloadType: core.oam.dev/v1alpha1.Server
   osType: linux
   arch: amd64
   parameters:
     - name: dbuser
-      description: mongo username
+      description: database username
       type: string
       required: false
     - name: dbpassword
-      description: mongo password
-      type: string
-      required: false
-    - name: rootpassword
-      description: mongo root password
+      description: database password
       type: string
       required: false
     - name: database
@@ -24,31 +20,26 @@ spec:
       type: string
       required: false                 
   containers:
-    - name: mongodb
-      image: docker.io/bitnami/mongodb:4.0.10-debian-9-r39   
+    - name: postgres
+      image: docker.io/postgres:9.6.17-alpine   
       env:
-        - name: MONGODB_USERNAME
-          value: "dbuser"
+        - name: POSTGRES_USER
+          value: "postgres"
           fromParam: "dbuser"
-        - name: MONGODB_PASSWORD
+        - name: POSTGRES_PASSWORD
           value: "dbpassword"
-          fromParam: "dbpassword"   
-        - name: MONGODB_ROOT_PASSWORD
-          value: "dbpassword"       
-          fromParam: "rootpassword"
-        - name: MONGODB_DATABASE
-          value: "hackfest"       
+          fromParam: "dbpassword"
+        - name: POSTGRES_DB
+          value: "hackfest"  
           fromParam: "database"
       ports:
-        - name: mongodb
-          containerPort: 27017
+        - name: postgres
+          containerPort: 5432
           protocol: TCP
       readinessProbe:
         exec:
           command:
-          - mongo
-          - --eval
-          - db.adminCommand('ping')
+            - echo
         failureThreshold: 6
         initialDelaySeconds: 5
         periodSeconds: 10
@@ -57,9 +48,7 @@ spec:
       livenessProbe:
         exec:
           command:
-          - mongo
-          - --eval
-          - db.adminCommand('ping')
+            - echo
         failureThreshold: 6
         initialDelaySeconds: 30
         periodSeconds: 10
