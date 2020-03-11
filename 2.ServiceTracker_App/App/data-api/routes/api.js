@@ -3,7 +3,6 @@ const async = require('async');
 const dayjs = require('dayjs');
 const express = require('express');
 const jsonResponse = require('../models/express/jsonResponse');
-const mongoose = require('mongoose');
 const path = require('path');
 const relativeTime = require('dayjs/plugin/relativeTime');
 const router = express.Router();
@@ -13,12 +12,19 @@ const site = require('../models/util/site');
 dayjs.extend(relativeTime);
 
 /* Models and Telemetry event info */
-const Flights = mongoose.model('Flights');
-const LatestFlight = mongoose.model('LatestFlight');
-const Quakes = mongoose.model('Quakes');
-const LatestQuake = mongoose.model('LatestQuake');
-const Weather = mongoose.model('Weather');
-const LatestWeather = mongoose.model('LatestWeather');
+const flights = require('../models/database/flights');
+const latestFlight = require('../models/database/latestFlight');
+const quakes = require('../models/database/quakes');
+const latestQuake = require('../models/database/latestQuake');
+const weather = require('../models/database/weather');
+const latestWeather = require('../models/database/latestWeather');
+
+const Flights = flights.Model;
+const LatestFlight = latestFlight.Model;
+const Quakes = quakes.Model;
+const LatestQuake = latestQuake.Model;
+const Weather = weather.Model;
+const LatestWeather = latestWeather.Model;
 
 /**
  *
@@ -86,16 +92,16 @@ router.get('/get/latest/:datatype', (req, res, next) => {
 });
 
 router.post('/save/flights/:timestamp', (req, res, next) => {
-  var latest = new LatestFlight({ Timestamp: req.params.timestamp });
-  var flights = new Flights({
+  var latest = { Timestamp: req.params.timestamp };
+  var flights = {
     Timestamp: req.params.timestamp,
     FeatureCollection: req.body
-  });
+  };
 
   async.waterfall(
     [
       cb => {
-        saveDataObjToDb(flights, (e, r) => {
+        saveDataObjToDb(Flights, flights, (e, r) => {
           if (r) {
             cb(null, {
               FlightCount: flights.FeatureCollection.length,
@@ -105,7 +111,7 @@ router.post('/save/flights/:timestamp', (req, res, next) => {
         });
       },
       (flightDetail, cb) => {
-        saveDataObjToDb(latest, (e, r) => {
+        saveDataObjToDb(LatestFlight, latest, (e, r) => {
           cb(e, flightDetail);
         });
       }
@@ -117,16 +123,16 @@ router.post('/save/flights/:timestamp', (req, res, next) => {
 });
 
 router.post('/save/quakes/:timestamp', (req, res, next) => {
-  var latest = new LatestQuake({ Timestamp: req.params.timestamp });
-  var quakes = new Quakes({
+  var latest = { Timestamp: req.params.timestamp };
+  var quakes = {
     Timestamp: req.params.timestamp,
     FeatureCollection: req.body
-  });
+  };
 
   async.waterfall(
     [
       cb => {
-        saveDataObjToDb(quakes, (e, r) => {
+        saveDataObjToDb(Quakes, quakes, (e, r) => {
           if (r) {
             cb(null, {
               QuakeCount: quakes.FeatureCollection.length,
@@ -136,7 +142,7 @@ router.post('/save/quakes/:timestamp', (req, res, next) => {
         });
       },
       (quakeDetail, cb) => {
-        saveDataObjToDb(latest, (e, r) => {
+        saveDataObjToDb(LatestQuake, latest, (e, r) => {
           cb(e, quakeDetail);
         });
       }
@@ -148,16 +154,16 @@ router.post('/save/quakes/:timestamp', (req, res, next) => {
 });
 
 router.post('/save/weather/:timestamp', (req, res, next) => {
-  var latest = new LatestWeather({ Timestamp: req.params.timestamp });
-  var weather = new Weather({
+  var latest = { Timestamp: req.params.timestamp };
+  var weather = {
     Timestamp: req.params.timestamp,
     FeatureCollection: req.body
-  });
+  };
 
   async.waterfall(
     [
       cb => {
-        saveDataObjToDb(weather, (e, r) => {
+        saveDataObjToDb(Weather, weather, (e, r) => {
           if (r) {
             cb(null, {
               WeatherLayerCount: weather.FeatureCollection.length,
@@ -167,7 +173,7 @@ router.post('/save/weather/:timestamp', (req, res, next) => {
         });
       },
       (weatherDetail, cb) => {
-        saveDataObjToDb(latest, (e, r) => {
+        saveDataObjToDb(LatestWeather, latest, (e, r) => {
           cb(e, weatherDetail);
         });
       }
@@ -178,10 +184,10 @@ router.post('/save/weather/:timestamp', (req, res, next) => {
   );
 });
 
-function saveDataObjToDb(data, cb) {
-  data
-    .save()
-    .then(doc => {
+function saveDataObjToDb(model, data, cb) {
+  model
+    .upsert(data)
+    .then(() => {
       cb(null, true);
     })
     .catch(err => {
@@ -191,17 +197,8 @@ function saveDataObjToDb(data, cb) {
     });
 }
 
-function getDataObjFromDb(obj, timestamp, cb) {
-  obj
-    .findOne({ Timestamp: timestamp })
-    .limit(1)
-    .exec((err, doc) => {
-      if (err)
-        handleError(
-          site.name + ' func - getDataObjFromDb :: error retrieving data'
-        );
-      cb(err, doc);
-    });
+function getDataObjFromDb(model, timestamp, cb) {
+  model.findByPk(timestamp).then(r => cb(null, r)).catch(err => cb(err, null));
 }
 
 function determineObj(objName) {
@@ -217,36 +214,11 @@ function determineObj(objName) {
   }
 }
 
-// function getQuakesFromDb(timestamp, cb){
-//     Quakes
-//         .findOne({Timestamp: timestamp})
-//         .limit(1)
-//         .exec( (err, doc) => {
-//             cb(err, doc)
-//         })
-// }
-
-// function getWeatherFromDb(timestamp, cb){
-//     Weather
-//         .findOne({Timestamp: timestamp})
-//         .limit(1)
-//         .exec( (err, doc) => {
-//             cb(err, doc)
-//         })
-// }
-
-function getLatestObjFromDb(obj, cb) {
-  obj
-    .find()
-    .sort({ Timestamp: -1 })
-    .limit(1)
-    .exec((err, doc) => {
-      if (err)
-        handleError(
-          site.name + ' func - getLatestObjFromDb :: error retrieving data'
-        );
-      cb(err, doc);
-    });
+function getLatestObjFromDb(model, cb) {
+  model.findAll({
+    order: [['Timestamp', 'DESC']],
+    limit: 1
+  }).then(r => cb(null, r)).catch(err => cb(err, null));
 }
 
 function handleError(message) {

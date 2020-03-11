@@ -4,75 +4,77 @@ metadata:
   name: service-tracker
 spec:
   components:
-  - componentName: tracker-mongo-db
-    instanceName: mongodb
-    parameterValues:
-      - name: dbuser
-        value: dbuser
-      - name: dbpassword
-        value: dbpassword
-      - name: rootpassword
-        value: adminpassword
-      - name: database
-        value: hackfest     
-  - componentName: data-api
-    instanceName: data-api
-    parameterValues:
-      - name: dbuser
-        value: "dbuser"
-      - name: dbpassword
-        value: "dbpassword"
-      - name: dbipaddress
-        value: "mongodb.default.svc.cluster.local"
-      - name: dbport
-        value: "27017"
-      - name: database
-        value: "hackfest"       
-  - componentName: flights-api
-    instanceName: flights-api
-    parameterValues:
-      - name: dataUri
-        value: "http://data-api.default.svc.cluster.local:3009/"
-    traits:
-      - name: manual-scaler
-        parameterValues:
-          - name: replicaCount
-            value: 2   
-  - componentName: quakes-api
-    instanceName: quakes-api
-    parameterValues:
-      - name: dataUri
-        value: "http://data-api.default.svc.cluster.local:3009/"  
-    traits:
-      - name: manual-scaler
-        parameterValues:
-          - name: replicaCount
-            value: 2       
-  - componentName: weather-api
-    instanceName: weather-api
-    parameterValues:
-      - name: dataUri
-        value: "http://data-api.default.svc.cluster.local:3009/"
-    traits:
-      - name: manual-scaler
-        parameterValues:
-          - name: replicaCount
-            value: 2        
-  - componentName: service-tracker-ui
-    instanceName: service-tracker-ui
-    parameterValues:
-      - name: flightsUri
-        value: "http://flights-api.default.svc.cluster.local:3003/"
-      - name: weatherUri
-        value: "http://weather-api.default.svc.cluster.local:3015/"
-      - name: quakesUri
-        value: "http://quakes-api.default.svc.cluster.local:3012/"
-    traits:
-      - name: ingress
-        parameterValues:
-          - name: hostname
-            value: servicetracker.oam.io
-          - name: path
-            value: / 
-          - name: service_port
-            value: 8080
+    - componentName: tracker-postgres-db
+      instanceName: postgres
+      parameterValues:
+        - name: dbuser
+          value: dbuser
+        - name: dbpassword
+          value: dbpassword
+        - name: database
+          value: hackfest  
+    - componentName: data-api
+      instanceName: data-api
+      parameterValues:
+        - name: dbuser
+          value: "dbuser"
+        - name: dbpassword
+          value: "dbpassword"
+        - name: dbhostname
+          value: "postgres.default.svc.cluster.local"
+        - name: dbport
+          value: "5432"
+        - name: dbname
+          value: "hackfest"  
+        - name: dbdriver
+          value: "postgres"
+        - name: dboptions
+          value: ""
+    - componentName: flights-api
+      instanceName: flights-api
+      parameterValues:
+        - name: dataUri
+          value: "http://data-api.default.svc.cluster.local:3009/"
+      traits:
+        - name: manual-scaler
+          parameterValues:
+            - name: replicaCount
+              value: 2
+    - componentName: quakes-api
+      instanceName: quakes-api
+      parameterValues:
+        - name: dataUri
+          value: "http://data-api.default.svc.cluster.local:3009/"  
+      traits:
+        - name: manual-scaler
+          parameterValues:
+            - name: replicaCount
+              value: 2       
+    - componentName: weather-api
+      instanceName: weather-api
+      parameterValues:
+        - name: dataUri
+          value: "http://data-api.default.svc.cluster.local:3009/"
+      traits:
+        - name: manual-scaler
+          parameterValues:
+            - name: replicaCount
+              value: 2        
+    - componentName: service-tracker-ui
+      instanceName: service-tracker-ui
+      parameterValues:
+        - name: flightsUri
+          value: "http://flights-api.default.svc.cluster.local:3003/"
+        - name: weatherUri
+          value: "http://weather-api.default.svc.cluster.local:3015/"
+        - name: quakesUri
+          value: "http://quakes-api.default.svc.cluster.local:3012/"
+      traits:
+        - name: ingress
+          parameterValues:
+            - name: hostname
+              value: servicetracker.oam.io
+            - name: path
+              value: / 
+            - name: service_port
+              value: 8080

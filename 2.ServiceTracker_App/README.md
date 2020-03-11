@@ -1,6 +1,6 @@
 ## Service Tracker Example
 
-This is an example microservices application with a Javascript Web UI, a MongoDB database, and a series of API microservices. The idea is that various app developers would create Components for their corresponding apps. The overall config will add traits and allow the app to be fully deployed.
+This is an example microservices application with a Javascript Web UI, a Postgres database, and a series of API microservices. The idea is that various app developers would create Components for their corresponding apps. The overall config will add traits and allow the app to be fully deployed.
 The application being deployed is shown in the following diagram:
 
 ![Application architecture diagram](service-tracker-diagram.jpg)
@@ -11,7 +11,7 @@ In this example, there are various roles that handle each aspect of the OAM appl
 
 * UI Developer
 * API Microservices Developer
-* MongoDB Admin
+* Postgres Admin
 * App Operator / SRE (handles application deployment in Kubernetes)
 
 ## Quickstart: Deploy the sample to Rudr running on any Kubernetes cluster
@@ -31,7 +31,7 @@ As an infrastructure operator, I choose to set up the Kubernetes cluster with Ru
 
 ### Application Developer: Authoring and registering component schematics
 
-There is one UI microservice, four API microservices and one Mongo DB admin. Each team is responsible for delivering the component schematic for their microservice.
+There is one UI microservice, four API microservices and one Postgres DB admin. Each team is responsible for delivering the component schematic for their microservice.
 
 1. The **OAM Component Schematics** that are applied require the following information about the app from the developers:
 

@@ -8,38 +8,87 @@ spec:
   arch: amd64
   parameters:
     - name: dbuser
-      description: mongo username
+      description: database username
       type: string
       required: false
     - name: dbpassword
-      description: mongo password
+      description: database password
       type: string
       required: false
-    - name: dbipaddress
-      description: mongo IP address
+    - name: dbname
+      description: database name
+      type: string
+      required: false
+    - name: dbhostname
+      description: database hostname
       type: string
       required: false
     - name: dbport
-      description: mongo port number
+      description: database port number
       type: string
-      required: false            
+      required: false
+    - name: dbdriver
+      description: database driver - one of 'mysql' | 'mariadb' | 'postgres' | 'mssql'
+      type: string
+      required: false
+    - name: dboptions
+      description: config as JSON
+      type: string
+      required: false
   containers:
     - name: data-api
-      image: sonofjorel/rudr-data-api:0.49   
+      image: artursouza/rudr-data-api:0.50
       env:
-        - name: MONGODB_USER
-          value: "foo"
+        - name: DATABASE_USER
+          value: "dbuser"
           fromParam: "dbuser"
-        - name: MONGODB_PASSWORD
-          value: "foo"
+        - name: DATABASE_PASSWORD
+          value: "dbpassword"
           fromParam: "dbpassword"
-        - name: MONGODB_IP
-          value: "foo"        
-          fromParam: dbipaddress
-        - name: MONGODB_PORT
-          value: "foo"        
-          fromParam: dbport    
+        - name: DATABASE_NAME
+          value: "mydatabase"      
+          fromParam: dbname
+        - name: DATABASE_HOSTNAME
+          value: "localhost"      
+          fromParam: dbhostname
+        - name: DATABASE_PORT
+          value: "5432"        
+          fromParam: dbport  
+        - name: DATABASE_DRIVER
+          value: "postgres"    
+          fromParam: dbdriver
+        - name: DATABASE_OPTIONS
+          value:
+          fromParam: dboptions
       ports:
         - name: http
           containerPort: 3009
           protocol: TCP
+      readinessProbe:
+        exec:
+          command:
+            - wget
+            - -q
+            - 'http://127.0.0.1:3009/status'
+            - -O
+            - /dev/null
+            - -S
+        failureThreshold: 6
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      livenessProbe:
+        exec:
+          command:
+            - wget
+            - -q
+            - 'http://127.0.0.1:3009/status'
+            - -O
+            - /dev/null
+            - -S
+        failureThreshold: 6
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5 
