@@ -1,11 +1,73 @@
-apiVersion: core.oam.dev/v1alpha1
-kind: ComponentSchematic
+apiVersion: core.oam.dev/v1alpha2
+kind: Component
 metadata:
   name: data-api
 spec:
-  workloadType: core.oam.dev/v1alpha1.Server
-  osType: linux
-  arch: amd64
+  workload:
+    apiVersion: core.oam.dev/v1alpha2
+    kind: ContainerizedWorkload
+    metadata:
+      name: service-workload
+    spec:
+      osType: linux
+      arch: amd64
+      containers:
+        - name: data-api
+          image: artursouza/rudr-data-api:0.50
+          env:
+            - name: DATABASE_USER
+              value: "dbuser"
+              fromParam: "dbuser"
+            - name: DATABASE_PASSWORD
+              value: "dbpassword"
+              fromParam: "dbpassword"
+            - name: DATABASE_NAME
+              value: "mydatabase"      
+              fromParam: dbname
+            - name: DATABASE_HOSTNAME
+              value: "localhost"      
+              fromParam: dbhostname
+            - name: DATABASE_PORT
+              value: "5432"        
+              fromParam: dbport  
+            - name: DATABASE_DRIVER
+              value: "postgres"    
+              fromParam: dbdriver
+            - name: DATABASE_OPTIONS
+              value:
+              fromParam: dboptions
+          ports:
+            - name: http
+              containerPort: 3009
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - wget
+                - -q
+                - 'http://127.0.0.1:3009/status'
+                - -O
+                - /dev/null
+                - -S
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - wget
+                - -q
+                - 'http://127.0.0.1:3009/status'
+                - -O
+                - /dev/null
+                - -S
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5 
   parameters:
     - name: dbuser
       description: database username
@@ -35,60 +97,3 @@ spec:
       description: config as JSON
       type: string
       required: false
-  containers:
-    - name: data-api
-      image: artursouza/rudr-data-api:0.50
-      env:
-        - name: DATABASE_USER
-          value: "dbuser"
-          fromParam: "dbuser"
-        - name: DATABASE_PASSWORD
-          value: "dbpassword"
-          fromParam: "dbpassword"
-        - name: DATABASE_NAME
-          value: "mydatabase"      
-          fromParam: dbname
-        - name: DATABASE_HOSTNAME
-          value: "localhost"      
-          fromParam: dbhostname
-        - name: DATABASE_PORT
-          value: "5432"        
-          fromParam: dbport  
-        - name: DATABASE_DRIVER
-          value: "postgres"    
-          fromParam: dbdriver
-        - name: DATABASE_OPTIONS
-          value:
-          fromParam: dboptions
-      ports:
-        - name: http
-          containerPort: 3009
-          protocol: TCP
-      readinessProbe:
-        exec:
-          command:
-            - wget
-            - -q
-            - 'http://127.0.0.1:3009/status'
-            - -O
-            - /dev/null
-            - -S
-        failureThreshold: 6
-        initialDelaySeconds: 5
-        periodSeconds: 10
-        successThreshold: 1
-        timeoutSeconds: 5
-      livenessProbe:
-        exec:
-          command:
-            - wget
-            - -q
-            - 'http://127.0.0.1:3009/status'
-            - -O
-            - /dev/null
-            - -S
-        failureThreshold: 6
-        initialDelaySeconds: 30
-        periodSeconds: 10
-        successThreshold: 1
-        timeoutSeconds: 5 
