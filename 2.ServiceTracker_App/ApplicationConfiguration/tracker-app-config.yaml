@@ -1,11 +1,10 @@
-apiVersion: core.oam.dev/v1alpha1
+apiVersion: core.oam.dev/v1alpha2
 kind: ApplicationConfiguration
 metadata:
   name: service-tracker
 spec:
   components:
     - componentName: tracker-postgres-db
-      instanceName: postgres
       parameterValues:
         - name: dbuser
           value: dbuser
@@ -14,7 +13,6 @@ spec:
         - name: database
           value: hackfest  
     - componentName: data-api
-      instanceName: data-api
       parameterValues:
         - name: dbuser
           value: "dbuser"
@@ -31,7 +29,6 @@ spec:
         - name: dboptions
           value: ""
     - componentName: flights-api
-      instanceName: flights-api
       parameterValues:
         - name: dataUri
           value: "http://data-api.default.svc.cluster.local:3009/"
@@ -41,7 +38,6 @@ spec:
             - name: replicaCount
               value: 2
     - componentName: quakes-api
-      instanceName: quakes-api
       parameterValues:
         - name: dataUri
           value: "http://data-api.default.svc.cluster.local:3009/"  
@@ -51,7 +47,6 @@ spec:
             - name: replicaCount
               value: 2       
     - componentName: weather-api
-      instanceName: weather-api
       parameterValues:
         - name: dataUri
           value: "http://data-api.default.svc.cluster.local:3009/"
@@ -61,7 +56,6 @@ spec:
             - name: replicaCount
               value: 2        
     - componentName: service-tracker-ui
-      instanceName: service-tracker-ui
       parameterValues:
         - name: flightsUri
           value: "http://flights-api.default.svc.cluster.local:3003/"
