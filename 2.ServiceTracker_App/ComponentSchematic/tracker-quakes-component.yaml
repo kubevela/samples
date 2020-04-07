@@ -7,24 +7,24 @@ spec:
     apiVersion: core.oam.dev/v1alpha2
     kind: ContainerizedWorkload
     metadata:
-      name: service-workload
+      name: quakes-api
     spec:
       osType: linux
       arch: amd64
       containers:
         - name: quakes-api
-        image: sonofjorel/rudr-quakes-api:0.49   
-        env:
-          - name: DATA_SERVICE_URI
-            value: "foo"
-            fromParam: "dataUri"  
-        ports:
-          - name: http
-            containerPort: 3012
-            protocol: TCP
+          image: sonofjorel/rudr-quakes-api:0.49   
+          env:
+            - name: DATA_SERVICE_URI
+              value: "foo"
+          ports:
+            - name: http
+              containerPort: 3012
+              protocol: TCP
   parameters:
     - name: dataUri
       description: uri for data-api pod
-      type: string
       required: true
+      fieldPaths:
+      - spec.containers[0].env[0].value
 

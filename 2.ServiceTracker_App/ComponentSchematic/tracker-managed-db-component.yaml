@@ -1,0 +1,22 @@
+apiVersion: core.oam.dev/v1alpha2
+kind: Component
+metadata:
+  name: tracker-managed-postgres-db
+spec:
+  workload:
+    apiVersion: database.crossplane.io/v1alpha1
+    kind: PostgreSQLInstance
+    metadata:
+      name: app-postgresql
+    spec:
+      classSelector:
+        matchLabels:
+      writeConnectionSecretToRef:
+        name: postgresqlconn
+      engineVersion: "9.6"
+  parameters:
+  - name: dbconn
+    required: true
+    fieldPaths:
+    - spec.writeConnectionSecretToRef.name
+

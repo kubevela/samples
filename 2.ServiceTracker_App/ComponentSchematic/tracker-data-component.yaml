@@ -7,7 +7,7 @@ spec:
     apiVersion: core.oam.dev/v1alpha2
     kind: ContainerizedWorkload
     metadata:
-      name: service-workload
+      name: data-api
     spec:
       osType: linux
       arch: amd64
@@ -16,26 +16,25 @@ spec:
           image: artursouza/rudr-data-api:0.50
           env:
             - name: DATABASE_USER
-              value: "dbuser"
-              fromParam: "dbuser"
+              fromSecret:
+                name: postgresqlconn
+                key: username
             - name: DATABASE_PASSWORD
-              value: "dbpassword"
-              fromParam: "dbpassword"
-            - name: DATABASE_NAME
-              value: "mydatabase"      
-              fromParam: dbname
+              fromSecret:
+                name: postgresqlconn
+                key: password
             - name: DATABASE_HOSTNAME
-              value: "localhost"      
-              fromParam: dbhostname
+              fromSecret:
+                name: postgresqlconn
+                key: endpoint
+            - name: DATABASE_NAME
+              value: postgres
             - name: DATABASE_PORT
-              value: "5432"        
-              fromParam: dbport  
+              value: 5432 
             - name: DATABASE_DRIVER
-              value: "postgres"    
-              fromParam: dbdriver
+              value: postgres    
             - name: DATABASE_OPTIONS
-              value:
-              fromParam: dboptions
+              value: ""
           ports:
             - name: http
               containerPort: 3009
@@ -69,31 +68,30 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5 
   parameters:
-    - name: dbuser
-      description: database username
-      type: string
+    - name: dbsecret
+      description: secret with database connection information
       required: false
-    - name: dbpassword
-      description: database password
-      type: string
-      required: false
+      fieldPaths:
+      - spec.containers[0].env[0].fromSecret.name
+      - spec.containers[0].env[1].fromSecret.name
+      - spec.containers[0].env[2].fromSecret.name
     - name: dbname
       description: database name
-      type: string
       required: false
-    - name: dbhostname
-      description: database hostname
-      type: string
-      required: false
+      fieldPaths:
+      - spec.containers[0].env[3].value
     - name: dbport
       description: database port number
-      type: string
       required: false
+      fieldPaths:
+      - spec.containers[0].env[4].value
     - name: dbdriver
       description: database driver - one of 'mysql' | 'mariadb' | 'postgres' | 'mssql'
-      type: string
       required: false
+      fieldPaths:
+      - spec.containers[0].env[5].value
     - name: dboptions
       description: config as JSON
-      type: string
       required: false
+      fieldPaths:
+      - spec.containers[0].env[6].value

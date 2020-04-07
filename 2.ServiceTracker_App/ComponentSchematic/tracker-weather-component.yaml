@@ -7,23 +7,23 @@ spec:
     apiVersion: core.oam.dev/v1alpha2
     kind: ContainerizedWorkload
     metadata:
-      name: service-workload
+      name: weather-api
     spec:
       osType: linux
       arch: amd64
       containers:
         - name: weather-api
-        image: sonofjorel/rudr-weather-api:0.49    
-        env:
-          - name: DATA_SERVICE_URI
-            value: "foo"
-            fromParam: "dataUri"  
-        ports:
-          - name: http
-            containerPort: 3015
-            protocol: TCP
+          image: sonofjorel/rudr-weather-api:0.49    
+          env:
+            - name: DATA_SERVICE_URI
+              value: "foo"
+          ports:
+            - name: http
+              containerPort: 3015
+              protocol: TCP
   parameters:
     - name: dataUri
       description: uri for data-api pod
-      type: string
       required: true
+      fieldPaths:
+      - spec.containers[0].env[0].value
