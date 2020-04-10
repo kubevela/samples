@@ -115,7 +115,11 @@ Ref to [update section](https://googlecontainertools.github.io/kpt/guides/consum
 
 ### Parameter Setting
 
-[KPT Setters](https://googlecontainertools.github.io/kpt/guides/consumer/set/) also have magic power along with OAM parameters.
+[KPT Setters](https://googlecontainertools.github.io/kpt/guides/consumer/set/) is a powerful feature which naturally matches to the idea of "separate concerns" design from OAM.
+
+In Open Application Model, developers can claim certain fields in the application YAML as "configurable", so in the following workflow, operators (or the platform) will be allowed to modify these fields.
+
+Now this workflow can be easily achieved with help of kpt.
 
 OAM parameter is very important feature as it allows App Developer could tell their demand to App Operator.
 
