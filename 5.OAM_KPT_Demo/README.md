@@ -33,7 +33,7 @@ kpt directly use GitHub repo as App Repository, so no action needed.
 
 With the help of KPT, we could directly use GitHub Repo as App Repository without organizing apps in any fixed format.
 
-### Release your OAM apps to App Repository
+### Release your application to App Repository
 
 So release your OAM app only need two steps.
 
