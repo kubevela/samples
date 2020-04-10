@@ -190,7 +190,7 @@ With KPT setters, this feature become more clear and useful. And you don't need 
 
 #### Create setter by App Developer
 
-As the app developer need to add two parameter for his component, we add two KPT setters here:
+Let's say the developer need to claim two fields as "configurable" for his application, he can add two kpt setters here:
 
 ```
 $ kpt cfg create-setter sampleapp/ instance-name example-component --field "metadata.name" --description "use to set an instance name" --set-by "sampleapp developer"
