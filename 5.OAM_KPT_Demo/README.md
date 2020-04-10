@@ -28,7 +28,8 @@ In that sense, it's a natural match for using kpt to manipulate the data which i
 
 Install OAM plugin to Kubernetes. In this demo, we will use Crossplane by following [this installation guides](https://github.com/oam-dev/crossplane-oam-sample#installation).
 
-## Building OAM App Repository with KPT
+## Create App Repository for kpt
+kpt directly use GitHub repo as App Repository, so no action needed.
 
 With the help of KPT, we could directly use GitHub Repo as App Repository without organizing apps in any fixed format.
 
