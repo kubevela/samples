@@ -26,7 +26,7 @@ In that sense, it's a natural match for using kpt to manipulate the data which i
 
 ## Pre-requisites
 
-Install OAM runtime by following the [installation guides](https://github.com/oam-dev/crossplane-oam-sample#installation).
+Install OAM plugin to Kubernetes. In this demo, we will use Crossplane by following [this installation guides](https://github.com/oam-dev/crossplane-oam-sample#installation).
 
 ## Building OAM App Repository with KPT
 
