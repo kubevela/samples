@@ -236,7 +236,7 @@ spec:
 ...
 ```
 
-Currently array fieldpath seems don't work and we have created an [issue #469](https://github.com/GoogleContainerTools/kpt/issues/469).
+Known issue: array field path seems don't work, see [kpt issue #469](https://github.com/GoogleContainerTools/kpt/issues/469).
 
 
 ### App Overview
