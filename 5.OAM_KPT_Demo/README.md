@@ -10,7 +10,19 @@ See the picture below:
 
 ![img](./resource/kpt_oam.png)
 
-KPT is the manipulator of data while OAM is the format of data. With the help of KPT, we could easily manipulate App YAML files in OAM abstraction.
+Both kpt and OAM are outcomes of "Configuration-as-Data (or, Infrastructure-as-Data, IaD)". 
+
+Pioneered by [Kubernetes community](https://twitter.com/bgrant0607/status/1221485437153243137), Configuration-as-Data emphasizes that "configuration should be treated as data and leverage pipelines for manipulation and policy enforcement". In Kubernetes, Configuration-as-Data approach builds upon the design of the [Kubernetes resource model (KRM)](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/architecture/resource-management.md). As a result, today any resource we applied to Kubernetes is a piece of data that represents the desired state for certain part of application or infrastructure in the real system.
+
+With the heart of Configuration-as-Data, a typical Kubernetes native application management workflow just looks like a "pipeline". See the picture below:
+
+![img](./resource/kpt_oam.png)
+
+In this workflow, kpt is the manipulator of data. Stored in data source like Git, the original data (e.g. deployment.yaml) will pass through a pipeline of kpt functionalities to be manipulated into the desire state step by step. For example, `labels` added, `replicas` modified and `image` updated etc. 
+
+So what is OAM then? OAM is the format of data. More accurately, OAM is a complementary data format to Kubernetes so it can expose higher level abstractions such as "application" to developers.
+
+In that sense, it's a natural match for using kpt to manipulate the data which is formatted by OAM specification.
 
 ## Pre-requisites
 
