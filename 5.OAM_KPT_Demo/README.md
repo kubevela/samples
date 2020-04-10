@@ -213,7 +213,7 @@ It's very clear and easy to understand.
 
 #### Set Value by App Operator
 
-Then the App Operator could set `instance-name` with a new name like this:
+Then the application operator could set `instance-name` with a new name like this:
 
 ```
 $ kpt cfg set sampleapp/ instance-name test-component
