@@ -1,4 +1,4 @@
-# Open Application Model with KPT
+# Managing custom Kubernetes applications with kpt
 
 This sample will show you how to use KPT to manage OAM Apps.
 
