@@ -1,6 +1,8 @@
 # Managing custom Kubernetes applications with kpt
 
-This sample will show you how to use KPT to manage OAM Apps.
+This guidance will demonstrate how to use kpt to manage custom Kubernetes applications (i.e. apps defined by CRDs instead of raw Kubernetes workloads). 
+
+We will use [Open Application Model](https://github.com/oam-dev/spec)(OAM) to describe the app for standardization and portability consideration. But you are free to use any Custom Resource to describe your application as well.
 
 ## Relationship between KPT and OAM
 
