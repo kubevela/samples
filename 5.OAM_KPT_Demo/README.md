@@ -4,7 +4,7 @@ This guidance will demonstrate how to use kpt to manage custom Kubernetes applic
 
 We will use [Open Application Model](https://github.com/oam-dev/spec)(OAM) to describe the app for standardization and portability consideration. But you are free to use any Custom Resource to describe your application as well.
 
-## Relationship between KPT and OAM
+## What is kpt and what is OAM?
 
 See the picture below:
 
