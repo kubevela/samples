@@ -10,7 +10,7 @@ spec:
       name: app-postgresql
     spec:
       classSelector:
-        matchLabels:
+        matchLabels: {}
       writeConnectionSecretToRef:
         name: postgresqlconn
       engineVersion: "9.6"
