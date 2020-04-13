@@ -7,7 +7,7 @@ spec:
     apiVersion: core.oam.dev/v1alpha2
     kind: ContainerizedWorkload
     metadata:
-      name: webui-workload
+      name: web-ui
     spec:
       osType: linux
       arch: amd64
@@ -17,13 +17,10 @@ spec:
           env:
             - name: FLIGHT_API_ROOT
               value: "foo"
-              fromParam: "flightsUri"
             - name: WEATHER_API_ROOT
               value: "foo"
-              fromParam: "weatherUri"
             - name: QUAKES_API_ROOT
-              value: "foo"
-              fromParam: "quakesUri"                    
+              value: "foo"                  
           ports:
             - name: http
               containerPort: 8080
@@ -31,14 +28,17 @@ spec:
   parameters:
     - name: flightsUri
       description: uri for flights-api pod
-      type: string
       required: true
+      fieldPaths:
+      - spec.containers[0].env[0].value
     - name: weatherUri
       description: uri for weather-api pod
-      type: string
       required: true
+      fieldPaths:
+      - spec.containers[0].env[1].value
     - name: quakesUri
       description: uri for quakes-api pod
-      type: string
       required: true
+      fieldPaths:
+      - spec.containers[0].env[2].value
         

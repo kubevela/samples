@@ -17,13 +17,10 @@ spec:
           env:
             - name: POSTGRES_USER
               value: "postgres"
-              fromParam: "dbuser"
             - name: POSTGRES_PASSWORD
               value: "dbpassword"
-              fromParam: "dbpassword"
             - name: POSTGRES_DB
-              value: "hackfest"  
-              fromParam: "database"
+              value: "hackfest"
           ports:
             - name: postgres
               containerPort: 5432
@@ -49,13 +46,16 @@ spec:
   parameters:
     - name: dbuser
       description: database username
-      type: string
       required: false
+      fieldPaths:
+      - spec.containers[0].env[0].value 
     - name: dbpassword
       description: database password
-      type: string
       required: false
+      fieldPaths:
+      - spec.containers[0].env[1].value 
     - name: database
       description: new database
-      type: string
-      required: false     
+      required: false
+      fieldPaths:
+      - spec.containers[0].env[2].value 
