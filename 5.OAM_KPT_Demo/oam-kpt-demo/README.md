@@ -7,7 +7,7 @@ input and writing the output.
 
 ## Build
 
-You could build and push to your own image repo, in this example, we push it to `wonderflow/kpt-oam-demo` as example.
+You could build and push to your own image repo, in this example, we push it to `wonderflow/kpt-oam-demo` docker image as example.
 
 ```
 docker build -t wonderflow/kpt-oam-demo .

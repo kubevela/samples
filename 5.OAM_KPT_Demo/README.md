@@ -194,7 +194,7 @@ $ kpt cfg create-setter sampleapp/ instance-name example-component --field "meta
 ```
 
 ```shell
-$ kpt cfg create-setter sampleapp/ image nginx:1.16.1 --field "spec.workload.spec.containers[0].image" --description "use to set image for component" --set-by "sampleapp developer"
+$ kpt cfg create-setter sampleapp/ image nginx:1.16.1 --field "image" --description "use to set image for component" --set-by "sampleapp developer"
 ```
 
 Then the app operator could see which parameters are available in this component like below:
@@ -202,7 +202,7 @@ Then the app operator could see which parameters are available in this component
 ```shell
 $ kpt cfg list-setters sampleapp/
   NAME              VALUE               SET BY                   DESCRIPTION             COUNT
-  image           nginx:1.16.1        sampleapp developer   use to set image for component   0
+  image           nginx:1.16.1        sampleapp developer   use to set image for component   1
   instance-name   example-component   sampleapp developer   use to set an instance name      1
 ```
 
@@ -232,8 +232,6 @@ spec:
     - metadata.name
 ...
 ```
-
-Known issue: array field path seems don't work, see [kpt issue #469](https://github.com/GoogleContainerTools/kpt/issues/469).
 
 ### App Overview
 
@@ -278,6 +276,6 @@ configmap/grouping-object-a4e18a93 pruned
 2 resource(s) pruned
 ```
 
-Currently `kpt live apply` seems not work well and we have created an [issue #498](https://github.com/GoogleContainerTools/kpt/issues/498).
+Currently `kpt live apply` seems not work well and will be fixed soon by [issue #498](https://github.com/GoogleContainerTools/kpt/issues/498).
 
 Happly building OAM apps with kpt!
