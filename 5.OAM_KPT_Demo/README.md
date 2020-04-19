@@ -2,7 +2,7 @@
 
 This guidance will demonstrate how to use kpt to manage custom Kubernetes applications (i.e. apps defined by CRDs instead of raw Kubernetes workloads).
 
-We will use [Open Application Model](https://github.com/oam-dev/spec)(OAM) to describe the app for standardization and portability consideration. But you are free to use any Custom Resource to describe your application as well.
+We will use [Open Application Model](https://github.com/oam-dev/spec)(OAM) to describe the app for standardization and portability consideration. But you are free to use any Custom Resource to describe your application as well. [Crossplane](https://github.com/crossplane/crossplane) will be installed as the OAM runtime for Kubernetes.
 
 ## What is kpt and what is OAM?
 
@@ -16,13 +16,13 @@ With the heart of Configuration-as-Data, a typical Kubernetes native application
 
 In this workflow, kpt is the manipulator of data. Stored in data source like Git, the original data (e.g. deployment.yaml) will pass through a pipeline of kpt functionalities to be manipulated into the desire state step by step. For example, `labels` added, `replicas` modified and `image` updated etc. 
 
-So what is OAM then? OAM is the format of data. More accurately, OAM is a complementary data format to Kubernetes so it can expose higher level abstractions such as "application" to developers.
+So what is OAM then? OAM is the format of data. More accurately, OAM is a specific data format so Kubernetes can expose higher level abstraction such as "application" to developers.
 
 In that sense, it's a natural match for using kpt to manipulate the data which is formatted by OAM specification.
 
 ## Pre-requisites
 
-Install OAM plugin to Kubernetes. In this demo, we will use Crossplane by following [this installation guides](https://github.com/oam-dev/crossplane-oam-sample#installation).
+Install OAM Kubernetes runtime (Crossplane) by following [its installation guides](https://github.com/oam-dev/crossplane-oam-sample#installation).
 
 ## Create App Repository for kpt
 
@@ -86,7 +86,7 @@ workloaddefinition.core.oam.dev/containerizedworkloads.core.oam.dev created
 
 Several resources are created:
 
-* Component is the description of your application.
+* Component is the description of what you want to deploy.
 * ApplicationConfiguration is the description of operational policies for your Component.
 * TraitDefinition and WorkloadDefinition are internal CRDs for OAM plugin to use.
 
@@ -119,71 +119,6 @@ Ref to [update section](https://googlecontainertools.github.io/kpt/guides/consum
 In Open Application Model, developers can claim certain fields in the application YAML as "configurable", so in the following workflow, operators (or the platform) will be allowed to modify these fields.
 
 Now this workflow can be easily achieved with help of kpt.
-
-OAM parameter is very important feature as it allows App Developer tell their demand to App Operator.
-
-For example, in our sampleapp, App Developer create a component like below:
-
-```yaml
-apiVersion: core.oam.dev/v1alpha2
-kind: Component
-metadata:
-  name: example-component
-spec:
-  workload:
-    apiVersion: core.oam.dev/v1alpha2
-    kind: ContainerizedWorkload
-    spec:
-      containers:
-        - name: my-nginx
-          image: nginx:1.16.1
-          resources:
-            limits:
-              memory: "200Mi"
-          ports:
-            - containerPort: 4848
-              protocol: "TCP"
-          env:
-            - name: WORDPRESS_DB_PASSWORD
-              value: ""
-  parameters:
-    - name: instance-name
-      required: true
-      fieldPaths:
-        - metadata.name
-    - name: image
-      fieldPaths:
-        - spec.containers[0].image
-```
-
-The App Developer left two parameters which are `instance-name` and `image`.
-
-Then in AppConfig, App Operator could overwrite this parameter like below.
-
-```yaml
-apiVersion: core.oam.dev/v1alpha2
-kind: ApplicationConfiguration
-metadata:
-  name: example-appconfig
-spec:
-  components:
-    - componentName: example-component
-      parameterValues:
-        - name: instance-name
-          value: example-appconfig-workload
-        - name: image
-          value: nginx:latest
-      traits:
-        - trait:
-            apiVersion: core.oam.dev/v1alpha2
-            kind: ManualScalerTrait
-            metadata:
-              name:  example-appconfig-trait
-            spec:
-              replicaCount: 3
-```
-
-With kpt setters, this feature become more clear and useful. And you don't need to declare parameters in OAM yamls. Let's go through with it.
 
 #### Create setter by App Developer
 
