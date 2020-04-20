@@ -171,11 +171,9 @@ With kpt, you could see an overview of your App.
 $ kpt cfg count sampleapp
 ApplicationConfiguration: 1
 Component: 1
-TraitDefinition: 1
-WorkloadDefinition: 1
 ```
 
-So in the sampleapp, we have one ApplicationConfiguration, Component, TraitDefinition and WorkloadDefinition.
+So in the sampleapp, we have one ApplicationConfiguration and Component.
 
 ### Live apply
 
