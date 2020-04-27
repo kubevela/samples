@@ -32,10 +32,9 @@ application.
 As an infrastructure operator, I choose to set up the Kubernetes cluster with
 Crossplane.
 
-* [Install Crossplane](https://crossplane.io/docs/v0.9/install.html) on your
-  cluster.
 * Install either the
-  [local](https://github.com/crossplane/addon-oam-kubernetes-local) or
+  [local](https://github.com/crossplane/addon-oam-kubernetes-local) OAM addon following its instructions 
+  or install both [Crossplane](https://crossplane.io/docs/v0.9/install.html) and 
   [remote](https://github.com/crossplane/addon-oam-kubernetes-remote) OAM addon.
 * [Install the infrastructure
   provider](https://crossplane.io/docs/v0.9/install.html#installing-infrastructure-providers)
