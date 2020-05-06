@@ -20,11 +20,3 @@ spec:
           env:
             - name: WORDPRESS_DB_PASSWORD
               value: ""
-  parameters:
-    - name: instance-name
-      required: true
-      fieldPaths:
-        - metadata.name
-    - name: image
-      fieldPaths:
-        - spec.containers[0].image

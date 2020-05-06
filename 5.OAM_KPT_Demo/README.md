@@ -46,7 +46,7 @@ So release your OAM app only needs two steps.
 
 ### Fetch OAM app from remote Repository
 
-Using our [example repository](https://github.com/oam-dev/sample/tree/master/5.OAM_KPT_Demo/repository/) for this demo.
+Using our [example repository](https://github.com/oam-dev/samples/tree/master/5.OAM_KPT_Demo/repository/) for this demo.
 
 You could fetch OAM app from remote Repository using [kpt pkg get](https://googlecontainertools.github.io/kpt/reference/pkg/get/).
 
@@ -69,7 +69,7 @@ sampleapp
 ├── appconfig.yaml
 └── component.yaml
 
-0 directories, 5 files
+0 directories, 3 files
 ```
 
 ### Install sample app
@@ -113,7 +113,7 @@ Ref to [update section](https://googlecontainertools.github.io/kpt/guides/consum
 
 In Open Application Model, developers can claim certain fields in the application YAML as "configurable", so in the following workflow, operators (or the platform) will be allowed to modify these fields.
 
-Now this workflow can be easily achieved with help of kpt.
+Now this goal can be easily achieved with help of kpt.
 
 #### Create setter by App Developer
 
@@ -156,11 +156,14 @@ kind: Component
 metadata:
   name: test-component # {"$ref":"#/definitions/io.k8s.cli.setters.instance-name"}
 spec:
-  parameters:
-  - name: instance-name
-    fieldPaths:
-    - metadata.name
-...
+  workload:
+    apiVersion: core.oam.dev/v1alpha2
+    kind: ContainerizedWorkload
+    spec:
+      containers:
+      - name: my-nginx
+        image: nginx:1.16.1 # {"$ref":"#/definitions/io.k8s.cli.setters.image"}
+        ...
 ```
 
 ### App Overview
@@ -173,7 +176,7 @@ ApplicationConfiguration: 1
 Component: 1
 ```
 
-So in the sampleapp, we have one ApplicationConfiguration and Component.
+So in the sampleapp, we have one ApplicationConfiguration and one Component.
 
 ### Live apply
 
@@ -188,17 +191,17 @@ Initialized: ../sampleapp/grouping-object-template.yaml
 
 ```shell
 $ kpt live apply sampleapp --wait-for-reconcile
-configmap/grouping-object-a4e18a93 created
-applicationconfiguration.core.oam.dev/example-appconfig configured
-component.core.oam.dev/test-component created
-3 resource(s) applied. 2 created, 0 unchanged, 1 configured
-configmap/grouping-object-a4e18a93 is Current: Resource is always ready
+configmap/inventory-9ac03a44 unchanged
+applicationconfiguration.core.oam.dev/example-appconfig created
+component.core.oam.dev/example-component created
+3 resource(s) applied. 2 created, 1 unchanged, 0 configured
+configmap/inventory-9ac03a44 is Current: Resource is always ready
+applicationconfiguration.core.oam.dev/example-appconfig is NotFound: Resource not found
+component.core.oam.dev/example-component is NotFound: Resource not found
 applicationconfiguration.core.oam.dev/example-appconfig is Current: Resource is current
-resources failed to the reached Current status
-configmap/grouping-object-a4e18a93 pruned
-2 resource(s) pruned
+component.core.oam.dev/example-component is Current: Resource is current
+all resources has reached the Current status
+0 resource(s) pruned
 ```
-
-Currently `kpt live apply` seems not work well and will be fixed soon by [issue #498](https://github.com/GoogleContainerTools/kpt/issues/498).
 
 Happly building OAM apps with kpt!
