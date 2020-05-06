@@ -1,29 +1,21 @@
 apiVersion: core.oam.dev/v1alpha2
 kind: ApplicationConfiguration
 metadata:
-  name: service-tracker
+  name: service-tracker-managed
 spec:
   components:
-    - componentName: tracker-postgres-db
+    - componentName: tracker-managed-postgres-db
       parameterValues:
-        - name: dbuser
-          value: dbuser
-        - name: dbpassword
-          value: dbpassword
-        - name: database
-          value: hackfest  
+        - name: dbconn
+          value: trackerdbconn
     - componentName: data-api
       parameterValues:
-        - name: dbuser
-          value: "dbuser"
-        - name: dbpassword
-          value: "dbpassword"
-        - name: dbhostname
-          value: "postgres.default.svc.cluster.local"
+        - name: dbsecret
+          value: trackerdbconn
+        - name: dbname
+          value: postgres 
         - name: dbport
           value: "5432"
-        - name: dbname
-          value: "hackfest"  
         - name: dbdriver
           value: "postgres"
         - name: dboptions
@@ -51,7 +43,7 @@ spec:
             metadata:
               name: quakes-api
             spec:
-              replicaCount: 2    
+              replicaCount: 2 
     - componentName: weather-api
       parameterValues:
         - name: dataUri

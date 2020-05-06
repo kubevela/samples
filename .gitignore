@@ -46,6 +46,9 @@ TestResult.xml
 [Rr]eleasePS/
 dlldata.c
 
+# MacOS
+.DS_Store
+
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
 
