@@ -1,3 +1,14 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dbuser
+type: Opaque
+data:
+  endpoint: ZGItd29ya2xvYWQ=
+  password: ZGJwYXNzd29yZA==
+  username: cG9zdGdyZXM=
+
+---
 apiVersion: core.oam.dev/v1alpha2
 kind: ApplicationConfiguration
 metadata:
@@ -5,25 +16,14 @@ metadata:
 spec:
   components:
     - componentName: tracker-postgres-db
-      parameterValues:
-        - name: dbuser
-          value: dbuser
-        - name: dbpassword
-          value: dbpassword
-        - name: database
-          value: hackfest  
     - componentName: data-api
       parameterValues:
-        - name: dbuser
+        - name: dbsecret
           value: "dbuser"
-        - name: dbpassword
-          value: "dbpassword"
-        - name: dbhostname
-          value: "postgres.default.svc.cluster.local"
+        - name: dbname
+          value: "hackfest"
         - name: dbport
           value: "5432"
-        - name: dbname
-          value: "hackfest"  
         - name: dbdriver
           value: "postgres"
         - name: dboptions

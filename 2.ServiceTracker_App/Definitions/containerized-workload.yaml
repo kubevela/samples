@@ -5,3 +5,6 @@ metadata:
 spec:
   definitionRef:
     name: containerizedworkloads.core.oam.dev
+  childResourceKinds:
+    - apiVersion: apps/v1
+      kind: Deployment
