@@ -218,7 +218,7 @@ spec:
 
 Check the status of Knative Route.
 ```shell
-✗ k get route
+$ kubectl get route
 NAME     URL                                         READY   REASON
 webapp   http://webapp.default.8.210.134.25.xip.io   True
 ```
@@ -229,4 +229,3 @@ Bingo!
 ![image.png](./application_home_page.png)
 
 Have fun with OAM and Knative.
-
