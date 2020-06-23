@@ -18,13 +18,7 @@ spec:
         masterUsername: "test123"
       writeConnectionSecretToRef:
         namespace: default
-        name: alibaba-rdspostgresql-conn
+        name: db-secret
       providerRef:
         name: alibaba-provider
       reclaimPolicy: Delete
-
-  parameters:
-  - name: dbconn
-    required: true
-    fieldPaths:
-    - spec.writeConnectionSecretToRef.name

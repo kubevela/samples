@@ -153,10 +153,6 @@ spec:
     - componentName: webapp
 
     - componentName: db
-      parameterValues:
-        - name: dbconn
-          value: db-secret
-
 ```
 
 In a Kubernetes cluster, submit manifests of these two components and the ApplicationConfiguration.
@@ -195,7 +191,7 @@ NAME     LATESTCREATED   LATESTREADY    READY   REASON
 webapp   webapp-c8s4n    webapp-c8s4n   True
 ```
 
-Edit `appconfig-1.yaml`, add Knative Route as shown in `appconfig-2.yaml` and submit it.
+Edit `appconfig-1.yaml`, add Knative Route with the latest revision of Configuration as shown in `appconfig-2.yaml` and submit it.
 
 ```shell
 apiVersion: core.oam.dev/v1alpha2
@@ -218,9 +214,6 @@ spec:
                   percent: 100
 
     - componentName: db
-      parameterValues:
-        - name: dbconn
-          value: db-secret
 ```
 
 Check the status of Knative Route.

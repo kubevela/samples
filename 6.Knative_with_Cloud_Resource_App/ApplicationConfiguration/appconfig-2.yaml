@@ -18,6 +18,3 @@ spec:
                   percent: 100
 
     - componentName: db
-      parameterValues:
-        - name: dbconn
-          value: db-secret
