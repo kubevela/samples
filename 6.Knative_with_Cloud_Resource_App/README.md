@@ -186,7 +186,7 @@ At this time, a Postgresql instance is provisioned, and we can see it from Aliba
 The application `webapp` also generates a Knative Configuration.
 
 ```shell
-✗ k get configuration
+$ kubectl get configuration
 NAME     LATESTCREATED   LATESTREADY    READY   REASON
 webapp   webapp-c8s4n    webapp-c8s4n   True
 ```
