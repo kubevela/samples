@@ -176,7 +176,7 @@ NAME        WORKLOAD-KIND
 db          RDSInstance
 webapp      Configuration
 
-✗ k get RDSInstance
+$ kubectl get RDSInstance
 NAME             READY   SYNCED   STATE      ENGINE       VERSION   AGE
 rdspostgresql3   True    True     Running    PostgreSQL   9.4       11m
 ```
