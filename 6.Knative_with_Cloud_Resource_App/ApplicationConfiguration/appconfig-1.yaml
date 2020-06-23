@@ -1,0 +1,12 @@
+apiVersion: core.oam.dev/v1alpha2
+kind: ApplicationConfiguration
+metadata:
+  name: knative-postgresql-appconfig
+spec:
+  components:
+    - componentName: webapp
+
+    - componentName: db
+      parameterValues:
+        - name: dbconn
+          value: db-secret

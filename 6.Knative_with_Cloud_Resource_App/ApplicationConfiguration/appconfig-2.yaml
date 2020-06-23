@@ -1,0 +1,23 @@
+apiVersion: core.oam.dev/v1alpha2
+kind: ApplicationConfiguration
+metadata:
+  name: knative-postgresql-appconfig
+spec:
+  components:
+    - componentName: webapp
+      traits:
+        - trait:
+            apiVersion: serving.knative.dev/v1
+            kind: Route
+            metadata:
+              name: webapp
+              namespace: default
+            spec:
+              traffic:
+                - revisionName: webapp-8t2h5
+                  percent: 100
+
+    - componentName: db
+      parameterValues:
+        - name: dbconn
+          value: db-secret
