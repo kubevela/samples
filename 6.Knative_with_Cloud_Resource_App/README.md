@@ -171,7 +171,7 @@ applicationconfiguration.core.oam.dev/knative-postgresql-appconfig configured
 By checking the list of Component, two components `db` and `webapp` are provisioned. After several minutes,
 the statue of RDSInstance will become to `Running`.
 ```shell
-✗ k get component
+$ kubectl  get component
 NAME        WORKLOAD-KIND
 db          RDSInstance
 webapp      Configuration
