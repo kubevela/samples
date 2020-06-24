@@ -5,5 +5,15 @@ metadata:
 spec:
   components:
     - componentName: webapp
+      dataInputs:
+        - valueFrom:
+            dataOutputName: alibaba-rdspostgresql-conn
+          toFieldPaths:
+            - spec.containers[0].env[0].valueFrom.secretKeyRef.name
+            - spec.containers[0].env[1].valueFrom.secretKeyRef.name
+            - spec.containers[0].env[2].valueFrom.secretKeyRef.name
 
     - componentName: db
+      dataOutputs:
+        - name: alibaba-rdspostgresql-conn
+          fieldPath: status.connSecret
