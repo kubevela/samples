@@ -76,7 +76,7 @@ spec:
 
 ## Prepare Application
 Based on the source code of application [flask-web-application](./App), generate image
-`zzxwill/postgresql-flask-web-application:v0.1`. It's very simple as it will exit if environment variables `DB_HOST`,
+`oamdev/postgresql-flask-web-application:v0.1`. It's very simple as it will exit if environment variables `DB_HOST`,
 `DB_USER` and  `DB_PASSWORD` could NOT be retrieved, or it will print those database connection information on the home
 page `index.html`.
 
@@ -115,7 +115,7 @@ spec:
       template:
         spec:
           containers:
-            - image: zzxwill/postgresql-flask-web-application:v0.1
+            - image: oamdev/postgresql-flask-web-application:v0.1
               name: webapp
               env:
                 - name: DB_HOST

@@ -13,7 +13,7 @@ spec:
       template:
         spec:
           containers:
-            - image: zzxwill/postgresql-flask-web-application:v0.1
+            - image: oamdev/postgresql-flask-web-application:v0.1
               name: webapp
               env:
                 - name: DB_HOST
