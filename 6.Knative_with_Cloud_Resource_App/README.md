@@ -25,17 +25,49 @@ Please refer to `Select Provider` and install Alibaba Cloud provider in [documen
 Please refer to [Install Knative](https://knative.dev/v0.14-docs/install/any-kubernetes-cluster/), remember to 1) pick 
 `Istio` as the networking layer and 2) choose `Magic DNS (xip.io)` to configure DNS.
 
+If you have trouble getting images from gcr.io, you can try replace images:
+
+* gcr.io/knative-releases/knative.dev/serving/cmd/activator@sha256:3b530bbcf892aff098444ae529a9d4150dfd0cd35c97babebd90eedae34ad8af
+=> wonderflow/knative-activator:v1
+
+* gcr.io/knative-releases/knative.dev/serving/cmd/autoscaler@sha256:bd125e90fffb44b843a183aa00f481cddee2317c0cfde9151c2482c5c2a8ed71  
+=> wonderflow/knative-autoscaler:v1
+
+* gcr.io/knative-releases/knative.dev/serving/cmd/controller@sha256:71f7c9f101e7e30e82a86d203fb98d6fa607c8d6ac2fcb73fd1defd365795223
+=> wonderflow/knative-controller:v1
+
+* gcr.io/knative-releases/knative.dev/net-istio/cmd/webhook@sha256:b04b047b1c980191bcfb046b97ab0afd39e19e570be341ce0028483fc548aa22
+=> wonderflow/knative-istio-webhook:v1
+
+* gcr.io/knative-releases/knative.dev/net-istio/cmd/controller@sha256:d31c49a1f07584f0393d651b4f9befb845e64e6b55c9d244e046f309560b6d0e
+=> wonderflow/knative-networking-istio:v1
+
+* gcr.io/knative-releases/knative.dev/serving/cmd/webhook@sha256:90562a10f5e37965f4f3332b0412afec1cf3dd1c06caed530213ca0603e52082 wonderflow/knative-webhook:v1
+
+* gcr.io/knative-releases/knative.dev/serving/cmd/default-domain@sha256:3f9f0baebbb2ace4aaa6f38537f2a76aa9f02669d43b1a9d8386bf6497559257
+=> wonderflow/knative-default-domain:v1
+
+// kubectl -n knative-serving edit configmap config-deployment
+* gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:f32c20456c6349a4fe99c83060009c7e9f6ba0c644ef854a04514e1f8aca982e
+=> wonderflow/knative-queue:v1
 
 ## Apply RBAC manifest
 Apply [rbac.yaml](./rbac.yaml).
 
 ```shell script
-$ k apply -f rbac.yaml
+$ kubectl apply -f rbac.yaml
 clusterrole.rbac.authorization.k8s.io/oam-knative-clusterrole created
 clusterrolebinding.rbac.authorization.k8s.io/oam-knative created
 ```
 
+## Apply TraitDefinition to make Knative Route as Trait
+
+```
+$ kubectl apply -f route-trait-definition.yaml
+```
+
 ## Prepare cloud resource
+
 Take Alibaba Cloud RDS resource `Postgresql` as a cloud resource example. Use RDS isntance `RDSInstance` as the workload of
 OAM Component `db`. `spec.forProvider.engine`, `spec.forProvider.engineVersion` and  `spec.forProvider.masterUsername`
 represent the engine type, version and username of a database instance in file `component-postgresql.yaml`.
@@ -65,20 +97,23 @@ spec:
       providerRef:
         name: alibaba-provider
       reclaimPolicy: Delete
+```
 
-  parameters:
-  - name: dbconn
-    required: true
-    fieldPaths:
-    - spec.writeConnectionSecretToRef.name
+Prepare this component into K8s cluster by:
 
+```
+$ kubectl apply -f Components/component-postgresql.yaml
+component.core.oam.dev/db created
 ```
 
 ## Prepare Application
-Based on the source code of application [flask-web-application](./App), generate image
-`oamdev/postgresql-flask-web-application:v0.1`. It's very simple as it will exit if environment variables `DB_HOST`,
+
+We have written a simple application [flask-web-application](./App) for this demo.
+It's very simple as it will exit if environment variables `DB_HOST`,
 `DB_USER` and  `DB_PASSWORD` could NOT be retrieved, or it will print those database connection information on the home
 page `index.html`.
+
+The main logic of this app is like below:
 
 ```python
 host = os.getenv("DB_HOST")
@@ -95,6 +130,8 @@ def index():
     print(1)
     return render_template("index.html", host=host, user=user)
 ```
+
+We have built an image for this app `oamdev/postgresql-flask-web-application:v0.1`. 
 
 Compose the application as Knative Configuration which works as the component of Component `webapp` in file 
 `component-knative-configuration-flask-app.yaml`.
@@ -121,25 +158,31 @@ spec:
                 - name: DB_HOST
                   valueFrom:
                     secretKeyRef:
-                      name: db-secret
                       key: endpoint
                 - name: DB_USER
                   valueFrom:
                     secretKeyRef:
-                      name: db-secret
                       key: username
                 - name: DB_PASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: db-secret
                       key: password
               ports:
                 - containerPort: 80
                   name: http1 # Must be one of "http1" or "h2c" (if supported). Defaults to "http1".
-
+          timeoutSeconds: 600
 ```
 
+Prepare this component into K8s cluster by:
+
+```
+$ kubectl apply -f Components/component-knative-configuration-flask-app.yaml
+component.core.oam.dev/webapp created
+```
+
+
 ## Deploy Application
+
 Compose cloud resource Component `db` and front web application Component `webapp` as ApplicationConfiguration
 `knative-postgresql-appconfig` in `appconfig-1.yaml`.
 
@@ -151,19 +194,27 @@ metadata:
 spec:
   components:
     - componentName: webapp
+      dataInputs:
+        - valueFrom:
+            dataOutputName: alibaba-rdspostgresql-conn
+          toFieldPaths:
+            - spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+            - spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
+            - spec.template.spec.containers[0].env[2].valueFrom.secretKeyRef.name
 
     - componentName: db
+      dataOutputs:
+        - name: alibaba-rdspostgresql-conn
+          fieldPath: "spec.writeConnectionSecretToRef.name"
+          conditions:
+            - op: eq
+              value: Running
+              fieldPath: "status.atProvider.dbInstanceStatus"
 ```
 
 In a Kubernetes cluster, submit manifests of these two components and the ApplicationConfiguration.
 
 ```shell
-✗ kubectl apply -f component-postgresql.yaml
-component.core.oam.dev/db created
-
-✗ kubectl apply -f component-knative-configuration-flask-app.yaml
-component.core.oam.dev/webapp created
-
 ✗ kubectl apply -f appconfig-1.yaml
 applicationconfiguration.core.oam.dev/knative-postgresql-appconfig configured
 ```
@@ -201,19 +252,29 @@ metadata:
 spec:
   components:
     - componentName: webapp
+      dataInputs:
+        - valueFrom:
+            dataOutputName: alibaba-rdspostgresql-conn
+          toFieldPaths:
+            - spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+            - spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
+            - spec.template.spec.containers[0].env[2].valueFrom.secretKeyRef.name
       traits:
         - trait:
             apiVersion: serving.knative.dev/v1
             kind: Route
-            metadata:
-              name: webapp
-              namespace: default
             spec:
               traffic:
-                - revisionName: webapp-8t2h5
+                - configurationName: webapp
                   percent: 100
-
     - componentName: db
+      dataOutputs:
+        - name: alibaba-rdspostgresql-conn
+          fieldPath: "spec.writeConnectionSecretToRef.name"
+          conditions:
+            - op: eq
+              value: Running
+              fieldPath: "status.atProvider.dbInstanceStatus"
 ```
 
 Check the status of Knative Route.
