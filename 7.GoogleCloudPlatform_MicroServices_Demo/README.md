@@ -71,7 +71,7 @@ Although kind does not support type=LoadBalancer currently but we can still acce
 kubectl port-forward svc/frontend 8000:80
 ```
 
-Then you can access **Online Boutique** through [http://localhots:8000/](http://localhost:8000/)
+Then you can access **Online Boutique** through [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ## Use istio for traffic management
 
@@ -94,7 +94,7 @@ We do port forwarding to the ingressgateway of istio.
 ```
 kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
 ```
-Then you can access the **Online Boutique** from [http://localhots:8080/](http://localhots:8080/).
+Then you can access the **Online Boutique** from [http://127.0.0.1:8080/](http://127.0.0.1:8080/).
 
 ### Traffic Management
 In this section, we show the istio's traffic management capabilities. 
