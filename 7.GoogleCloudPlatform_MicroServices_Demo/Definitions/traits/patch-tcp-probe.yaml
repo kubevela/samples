@@ -3,7 +3,7 @@ apiVersion: core.oam.dev/v1alpha2
 kind: TraitDefinition
 metadata:
   annotations:
-    definition.oam.dev/description: "A Probe detect the pod status by establish a socket connection"
+    definition.oam.dev/description: "A Probe detect the pod status by establishing a socket connection."
   name: patch-tcp-probe
 spec:
   appliesToWorkloads:

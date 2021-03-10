@@ -3,8 +3,8 @@ apiVersion: core.oam.dev/v1alpha2
 kind: TraitDefinition
 metadata:
   annotations:
-    definition.oam.dev/description: "Create a LoadBalancer for the specified service"
-  name: load-balancer
+    definition.oam.dev/description: "Create a LoadBalancer for the specified Pod."
+  name: patch-loadbalancer
 spec:
   appliesToWorkloads:
     - microservice

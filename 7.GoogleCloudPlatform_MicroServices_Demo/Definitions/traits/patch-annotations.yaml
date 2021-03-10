@@ -3,7 +3,7 @@ apiVersion: core.oam.dev/v1alpha2
 kind: TraitDefinition
 metadata:
   annotations:
-    definition.oam.dev/description: "add annotations"
+    definition.oam.dev/description: "Add annotations to the Deployment."
   name: patch-annotations
 spec:
   appliesToWorkloads:

@@ -4,7 +4,7 @@ kind: WorkloadDefinition
 metadata:
   name: microservice
   annotations:
-    definition.oam.dev/description: "Describes a microservice combo Deployment with Service"
+    definition.oam.dev/description: "Describes a microservice combo Deployment with Service."
 spec:
   definitionRef:
     name: deployment.apps

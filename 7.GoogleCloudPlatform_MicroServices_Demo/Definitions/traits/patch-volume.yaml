@@ -3,7 +3,7 @@ apiVersion: core.oam.dev/v1alpha2
 kind: TraitDefinition
 metadata:
   annotations:
-    definition.oam.dev/description: "add bookinfo-volume to pod"
+    definition.oam.dev/description: "Mount empty volumes to container."
   name: patch-volume
 spec:
   appliesToWorkloads:

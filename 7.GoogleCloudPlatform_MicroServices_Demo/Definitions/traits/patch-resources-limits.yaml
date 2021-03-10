@@ -3,11 +3,12 @@ apiVersion: core.oam.dev/v1alpha2
 kind: TraitDefinition
 metadata:
   annotations:
-    definition.oam.dev/description: "patch resource limit to container"
-  name: patch-container-resource
+    definition.oam.dev/description: "Add resource limit to container."
+  name: patch-resources-limits
 spec:
   appliesToWorkloads:
     - webservice
+    - enhanced-worker
     - worker
     - microservice
   schematic:
