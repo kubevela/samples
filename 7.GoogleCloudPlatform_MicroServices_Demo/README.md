@@ -18,7 +18,7 @@ Application **boutique** is composed of 11 microservices and 1 worker. microserv
 ![Architecture of microservices](./images/architecture-diagram.png)
 
 ### Apply WorkloadDefinition
-In this demo, we abstracted out 2 types of workload: [microservice](./Definitions/workloads/micrioservice.yaml) and [enhanced-worker](./Definitions/workloads/enhanced-worker.yaml).
+In this demo, we abstracted out 2 types of workload: [microservice](./Definitions/workloads/microservice.yaml) and [enhanced-worker](./Definitions/workloads/enhanced-worker.yaml).
 
 1. microservice: microservice describe a workload component Deployment with Service.
 2. enhanced-worker: enhanced-worker describe a long-running, scalable, containerized services that running at backend. They do NOT have network endpoint to receive external network traffic.
@@ -30,7 +30,8 @@ kubectl apply -f Definitions/workloads
 ```
 
 ### Apply TraitDefinition
-We defined 7 traits augments its component instance with operational behaviors.
+We have defined 7 traits to enhance the ability of wordload.
+
 1. [patch-annotations](./Definitions/traits/patch-annotations.yaml): patch-annotations can patch the annotation informations to the Deployment. In this demo, microservice **Frontend** and **Cache(redis)** use the [resource annotations](https://istio.io/latest/docs/reference/config/annotations/) that Istio supports to control its behavior.
 2. [patch-loadbalancer](./Definitions/traits/patch-loadbalancer.yaml): patch-loadbalancer can create a type=LoadBalancer Service for microservice workload to allow outside access.
 3. [patch-cmd-probe](./Definitions/traits/patch-cmd-probe.yaml): patch-cmd-probe can add a probe to detect the service status by executing command.
@@ -38,6 +39,8 @@ We defined 7 traits augments its component instance with operational behaviors.
 5. [patch-tcp-probe](./Definitions/traits/patch-tcp-probe.yaml): patch-tcp-probe can add a probe to detect the pod status by establishing a socket connection.
 6. [patch-resources-limits](./Definitions/traits/patch-resources-limits.yaml): this trait can patch resources limits.
 7. [patch-volume](./Definitions/traits/patch-volume.yaml): patch-volume can mount empty volumes to container.
+
+We register these traits to Kubevela.
 
 ```shell
 kubectl apply -f Definitions/traits
@@ -128,7 +131,7 @@ Although kind does not support type=LoadBalancer currently but we can still acce
 kubectl port-forward svc/frontend 8000:80
 ```
 
-Then you can access **Online Boutique** through [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
+Then you can access **Online Boutique** through [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 ![Online Boutique](./images/frontend-external.png)
 
 ## Use istio for traffic management
