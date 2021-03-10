@@ -1,7 +1,7 @@
 # GoogleCloudPlatform-MicroServices-Demo with Kubevela
 
 [MicroServices-Demo](https://github.com/GoogleCloudPlatform/microservices-demo) is a cloud-native microservices demo application.
-This Demo will create a **Online Boutique** application. **Online Boutique** consists of a 10-tier microservices application. 
+This Demo create a **Online Boutique** application. **Online Boutique** consists of a 10-tier microservices application. 
 The application is a web-based e-commerce app where users can browse items, add them to the cart, and purchase them. 
 In this example, we will deploy the demo in the local k8s cluster **kind**. 
 
@@ -12,7 +12,7 @@ In this example, we will deploy the demo in the local k8s cluster **kind**.
 ## Deploy Application
 
 ### Apply WorkloadDefinition
-In this demo, we abstracted out 2 types of workload: [microservice](./Definitions/workloads/micrioservice.yaml) and enhanced-worker(./Definitions/workloads/enhanced-worker.yaml).
+In this demo, we abstracted out 2 types of workload: [microservice](./Definitions/workloads/micrioservice.yaml) and [enhanced-worker](./Definitions/workloads/enhanced-worker.yaml).
 
 1. microservice: microservice describe a workload component Deployment with Service.
 2. enhanced-worker: enhanced-worker describe a long-running, scalable, containerized services that running at backend. They do NOT have network endpoint to receive external network traffic.
@@ -84,9 +84,9 @@ kubectl apply -f istio-manifests.yaml
 ### Access the web from istio gateway
 
 ```
-kubectl get svc/istio-ingressgateway -n istio-system
+$ kubectl get svc/istio-ingressgateway -n istio-system
 NAME                   TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)                                                                      AGE
-istio-ingressgateway   LoadBalancer   10.96.191.204   <pending>     15021:30077/TCP,80:31791/TCP,443:32113/TCP,31400:31457/TCP,15443:32035/TCP   12m
+istio-ingressgateway   LoadBalancer   <your ip>       <pending>     15021:30077/TCP,80:31791/TCP,443:32113/TCP,31400:31457/TCP,15443:32035/TCP   12m
 ```
 
 We do port forwarding to the ingressgateway of istio.
@@ -104,7 +104,7 @@ In this section, we show the istio's traffic management capabilities.
 kubectl apply -f istio-canary/destinationrule.yaml
 ```
 
-3. Deploy ProductCatalog v2. We need open [online-boutique.yaml](./online-boutique.yaml), then comment the Component productcatalogservice.
+2. Deploy ProductCatalog v2. We need open [online-boutique.yaml](./online-boutique.yaml)  and comment the Component productcatalogservice.
 
 ``` YAML
     # - name: productcatalogservice
@@ -129,7 +129,7 @@ kubectl apply -f istio-canary/destinationrule.yaml
     #         limitMemory: "128Mi"
 ```
 
-4. Uncomment the Component productcatalogservice-v2.
+3. Uncomment the Component productcatalogservice-v2.
 
 ``` YAML
     - name: productcatalogservice
@@ -156,36 +156,37 @@ kubectl apply -f istio-canary/destinationrule.yaml
             limitMemory: "128Mi"
 ```
 
-5. Deploy productcatalog v2.
+4. Deploy productcatalog v2.
 
 ```
 kubectl apply -f online-boutique.yaml
 ```
 
-6. Using kubectl get pods, verify that the v2 pod is Running.
+5. Using kubectl get pods, verify that the v2 pod is Running.
 ```
-kubectl get pod
+$ kubectl get pod
 NAME                                        READY   STATUS    RESTARTS   AGE
 productcatalogservice-v2-7f7b6fd9d4-lcnd5   2/2     Running   0          73s
 ```
 
-7. Create an Istio VirtualService to split incoming productcatalog traffic between v1 (75%) and v2 (25%).
+6. Create an Istio VirtualService to split incoming productcatalog traffic between v1 (75%) and v2 (25%).
 
 ```
 kubectl apply -f istio-canary/vs-split-traffic.yaml
 ```
 
-8. Open web browser, access again to the **Online Boutique**, productcatalogservice-v2 introduces a 3-second latency into all server requests. So refresh the homepage a few times. You should notice that periodically, the frontend is slower to load.
+7. Open web browser, access again to the **Online Boutique**, productcatalogservice-v2 introduces a 3-second latency into all server requests. So refresh the homepage a few times. You should notice that periodically, the frontend is slower to load.
 
-9. View traffic splitting in Kiali, this step you need install [Kiaki](https://istio.io/latest/docs/setup/getting-started/#dashboard).
+8. View traffic splitting in Kiali, this step you need install [Kiaki](https://istio.io/latest/docs/setup/getting-started/#dashboard).
 
 ```
 istioctl dashboard kiali
 ```
 Open the Kiali dashboard. Please navigate to Service Graph > namespace: default and select "Versioned App Graph."You should see that approximately 75% of productcatalog requests are going to v1.
+
 ![kiali](./kiali.png)
 
-10. Return 100% of productcatalog traffic to v1:
+9. Return 100% of productcatalog traffic to v1:
 ```
 kubectl apply -f istio-canary/rollback.yaml
 ```

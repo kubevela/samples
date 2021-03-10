@@ -35,6 +35,9 @@ spec:
         				containers: [{
         					name:  context.name
         					image: parameter.image
+        					if parameter.cmd != _|_ {
+        						command: parameter.cmd
+        					}
         					if parameter.env != _|_ {
         						env: [
         							for k, v in parameter.env {
@@ -61,8 +64,9 @@ spec:
         parameter: {
         	image:                         string
         	podShutdownGracePeriodSeconds: *30 | int
-        	env: [string]: string
-        	cpu:    string
-        	memory: string
+        	cmd?: [...string]
+        	env?: [string]: string
+        	cpu?:    string
+        	memory?: string
         }
         
