@@ -30,7 +30,8 @@ kubectl apply -f Definitions/workloads
 ```
 
 ### Apply TraitDefinition
-We have defined 7 traits to enhance the ability of wordload.
+
+We have defined following 7 traits to operate these workloads.
 
 1. [patch-annotations](./Definitions/traits/patch-annotations.yaml): patch-annotations can patch the annotation informations to the Deployment. In this demo, microservice **Frontend** and **Cache(redis)** use the [resource annotations](https://istio.io/latest/docs/reference/config/annotations/) that Istio supports to control its behavior.
 2. [patch-loadbalancer](./Definitions/traits/patch-loadbalancer.yaml): patch-loadbalancer can create a type=LoadBalancer Service for microservice workload to allow outside access.
@@ -200,4 +201,3 @@ Open the Kiali dashboard. Please navigate to Service Graph > namespace: default 
 ```
 kubectl apply -f istio-canary/rollback.yaml
 ```
-
