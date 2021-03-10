@@ -201,3 +201,23 @@ Open the Kiali dashboard. Please navigate to Service Graph > namespace: default 
 ```
 kubectl apply -f istio-canary/rollback.yaml
 ```
+
+## Clean up
+```shell
+$ kubectl delete -R --ignore-not-found -f .
+application.core.oam.dev "boutique" deleted
+traitdefinition.core.oam.dev "patch-annotations" deleted
+traitdefinition.core.oam.dev "patch-cmd-probe" deleted
+traitdefinition.core.oam.dev "patch-http-probe" deleted
+traitdefinition.core.oam.dev "patch-loadbalancer" deleted
+traitdefinition.core.oam.dev "patch-resources-limits" deleted
+traitdefinition.core.oam.dev "patch-tcp-probe" deleted
+traitdefinition.core.oam.dev "patch-volume" deleted
+workloaddefinition.core.oam.dev "enhanced-worker" deleted
+workloaddefinition.core.oam.dev "microservice" deleted
+destinationrule.networking.istio.io "productcatalogservice" deleted
+virtualservice.networking.istio.io "productcatalogservice" deleted
+gateway.networking.istio.io "frontend-gateway" deleted
+virtualservice.networking.istio.io "frontend-ingress" deleted
+virtualservice.networking.istio.io "frontend" deleted
+```
