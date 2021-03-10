@@ -15,6 +15,7 @@ Rudr is currently under community development with preview releases.  The master
 | [3. BikeSharing 360 Multi Container App](./3.BikeSharing360_MultiContainer_App) | This is an example microservices application with an ASP.NET Core Webform UI,  and a series of API microservices. The idea is that various app developers would create Components for their corresponding apps. The overall config will add traits and allow the app to be fully deployed |
 | [4. BikeSharing 360 Single Container App](./4.BikeSharing360_SingleContainer_App) | Demonstrates Rudr implementation of BikeSharing 360 app created in a Single Container. This sample has a single component and a configuration |
 | [6. Knative_with_Cloud_Resource_App](./6.Knative_with_Cloud_Resource_App) | Demonstrates how OAM helps Knative Configuration/Route to interact with cloud resources provisioned by Crossplane. |
+| [7. GoogleCloudPlatform_MicroServices_Demo](./7.GoogleCloudPlatform_MicroServices_Demo) | This is an example application consists of a 10-tier microservices application. The idea is that various app developers would create Workload for their corresponding apps. The overall config will add traits and allow the app to be fully deployed|
 
 To get started with the samples, clone this repository and follow instructions in each sample:
 ```bash

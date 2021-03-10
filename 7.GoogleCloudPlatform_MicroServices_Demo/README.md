@@ -191,7 +191,7 @@ istioctl dashboard kiali
 ```
 Open the Kiali dashboard. Please navigate to Service Graph > namespace: default and select "Versioned App Graph."You should see that approximately 75% of productcatalog requests are going to v1.
 
-![kiali](./kiali.png)
+![kiali](./images/kiali.png)
 
 6. Return 100% of productcatalog traffic to v1:
 ```

@@ -21,11 +21,11 @@ spec:
         			name: context.name
         			resources: {
         				limits: {
-        					if parameter.limitCPU != _|_ {
-        						cpu: parameter.limitCPU
+        					if parameter.cpu != _|_ {
+        						cpu: parameter.cpu
         					}
-        					if parameter.limitCPU != _|_ {
-        						memory: parameter.limitMemory
+        					if parameter.memory != _|_ {
+        						memory: parameter.memory
         					}
         				}
         			}
@@ -33,7 +33,7 @@ spec:
         	}
         }
         parameter: {
-        	limitCPU?:    string
-        	limitMemory?: string
+        	cpu?:    string
+        	memory?: string
         }
         
