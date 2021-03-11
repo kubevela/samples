@@ -1,0 +1,302 @@
+apiVersion: core.oam.dev/v1alpha2
+kind: Application
+metadata:
+  name: boutique
+  namespace: default
+spec:
+  components:
+    - name: frontend
+      type: microservice
+      settings:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/frontend:v0.2.2
+        servicePort: 80
+        containerPort: 8080
+        env:
+          PORT: "8080"
+          PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+          CURRENCY_SERVICE_ADDR: "currencyservice:7000"
+          CART_SERVICE_ADDR: "cartservice:7070"
+          RECOMMENDATION_SERVICE_ADDR: "recommendationservice:8080"
+          SHIPPING_SERVICE_ADDR: "shippingservice:50051"
+          CHECKOUT_SERVICE_ADDR: "checkoutservice:5050"
+          AD_SERVICE_ADDR: "adservice:9555"
+        cpu: "100m"
+        memory: "64Mi"
+      traits:
+        - name: patch-annotations
+          properties:
+            annotations:
+              sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        - name: patch-http-probe
+          properties:
+            readinessProbe:
+              port: 8080
+              path: "/_healthz"
+              httpHeaders:
+                Cookie: "shop_session-id=x-readiness-probe"
+            livenessProbe:
+              port: 8080
+              path: "/_healthz"
+              httpHeaders:
+                Cookie: "shop_session-id=x-liveness-probe"
+        - name: patch-resources-limits
+          properties:
+            cpu: "200m"
+            memory: "128Mi"
+        - name: patch-loadbalancer
+          properties:
+            servicePort: 80
+            containerPort: 8080
+
+    - name: cartservice
+      type: microservice
+      settings:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/cartservice:v0.2.2
+        servicePort: 7070
+        env:
+          REDIS_ADDR: "redis-cart:6379"
+        cpu: "200m"
+        memory: "64Mi"
+      traits:
+        - name: patch-cmd-probe
+          properties:
+            readinessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+            livenessProbe:
+              periodSeconds: 10
+              cmd: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
+        - name: patch-resources-limits
+          properties:
+            cpu: "300m"
+            memory: "128Mi"
+
+    - name: productcatalogservice
+      type: microservice
+      settings:
+        version: "v2"
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/productcatalogservice:v0.1.3
+        servicePort: 3550
+        env:
+          PORT: "3550"
+          EXTRA_LATENCY: 3s
+        cpu: "100m"
+        memory: "64Mi"
+      traits:
+        - name: patch-cmd-probe
+          properties:
+            readinessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:3550"]
+            livenessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:3550"]
+        - name: patch-resources-limits
+          properties:
+            cpu: "200m"
+            memory: "128Mi"
+
+    - name: currencyservice
+      type: microservice
+      settings:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/currencyservice:v0.2.2
+        servicePort: 7000
+        env:
+          PORT: "7000"
+        cpu: "100m"
+        memory: "64Mi"
+      traits:
+        - name: patch-cmd-probe
+          properties:
+            readinessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:7000"]
+            livenessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:7000"]
+        - name: patch-resources-limits
+          properties:
+            cpu: "200m"
+            memory: "128Mi"
+
+    - name: paymentservice
+      type: microservice
+      settings:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/paymentservice:v0.2.2
+        servicePort: 50051
+        env:
+          PORT: "50051"
+        cpu: "100m"
+        memory: "64Mi"
+      traits:
+        - name: patch-cmd-probe
+          properties:
+            readinessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:50051"]
+            livenessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:50051"]
+        - name: patch-resources-limits
+          properties:
+            cpu: "200m"
+            memory: "128Mi"
+
+    - name: shippingservice
+      type: microservice
+      settings:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/shippingservice:v0.2.2
+        servicePort: 50051
+        env:
+          PORT: "50051"
+        cpu: "100m"
+        memory: "64Mi"
+      traits:
+        - name: patch-cmd-probe
+          properties:
+            readinessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:50051"]
+            livenessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:50051"]
+        - name: patch-resources-limits
+          properties:
+            cpu: "200m"
+            memory: "128Mi"
+
+    - name: emailservice
+      type: microservice
+      settings:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/emailservice:v0.2.2
+        servicePort: 5000
+        env:
+          PORT: "8080"
+          DISABLE_PROFILER: "1"
+        cpu: "100m"
+        memory: "64Mi"
+      traits:
+        - name: patch-cmd-probe
+          properties:
+            readinessProbe:
+              periodSeconds: 5
+              cmd: ["/bin/grpc_health_probe", "-addr=:8080"]
+            livenessProbe:
+              periodSeconds: 5
+              cmd: ["/bin/grpc_health_probe", "-addr=:8080"]
+        - name: patch-resources-limits
+          properties:
+            cpu: "200m"
+            memory: "128Mi"
+
+    - name: checkoutservice
+      type: microservice
+      settings:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/checkoutservice:v0.2.2
+        servicePort: 5050
+        env:
+          PORT: "5050"
+          PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+          CURRENCY_SERVICE_ADDR: "currencyservice:7000"
+          CART_SERVICE_ADDR: "cartservice:7070"
+          SHIPPING_SERVICE_ADDR: "shippingservice:50051"
+          EMAIL_SERVICE_ADDR: "emailservice:5000"
+          PAYMENT_SERVICE_ADDR: "paymentservice:50051"
+        cpu: "100m"
+        memory: "64Mi"
+      traits:
+        - name: patch-cmd-probe
+          properties:
+            readinessProbe:
+              periodSeconds: 5
+              cmd: ["/bin/grpc_health_probe", "-addr=:5050"]
+            livenessProbe:
+              periodSeconds: 5
+              cmd: ["/bin/grpc_health_probe", "-addr=:5050"]
+        - name: patch-resources-limits
+          properties:
+            cpu: "200m"
+            memory: "128Mi"
+
+    - name: recommendationservice
+      type: microservice
+      settings:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/recommendationservice:v0.2.2
+        servicePort: 8080
+        env:
+          PORT: "8080"
+          PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+        cpu: "100m"
+        memory: "64Mi"
+      traits:
+        - name: patch-cmd-probe
+          properties:
+            readinessProbe:
+              periodSeconds: 5
+              cmd: ["/bin/grpc_health_probe", "-addr=:8080"]
+            livenessProbe:
+              periodSeconds: 5
+              cmd: ["/bin/grpc_health_probe", "-addr=:8080"]
+        - name: patch-resources-limits
+          properties:
+            cpu: "200m"
+            memory: "128Mi"
+
+    - name: adservice
+      type: microservice
+      settings:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/adservice:v0.2.2
+        servicePort: 9555
+        env:
+          PORT: "9555"
+        cpu: "200m"
+        memory: "180Mi"
+      traits:
+        - name: patch-cmd-probe
+          properties:
+            readinessProbe:
+              periodSeconds: 15
+              cmd: ["/bin/grpc_health_probe", "-addr=:9555"]
+            livenessProbe:
+              periodSeconds: 15
+              cmd: ["/bin/grpc_health_probe", "-addr=:9555"]
+        - name: patch-resources-limits
+          properties:
+            cpu: "300m"
+            memory: "300Mi"
+
+    - name: loadgenerator
+      type: enhanced-worker
+      settings:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/loadgenerator:v0.2.2
+        env:
+          FRONTEND_ADDR: "frontend:80"
+          USERS: "10"
+        cpu: "300m"
+        memory: "256Mi"
+      traits:
+        - name: patch-resources-limits
+          properties:
+            cpu: "500m"
+            memory: "512Mi"
+
+    - name: redis-cart
+      type: microservice
+      settings:
+        image: redis:alpine
+        servicePort: 6379
+        cpu: "70m"
+        memory: "200Mi"
+      traits:
+        - name: patch-annotations
+          properties:
+            annotations:
+              sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        - name: patch-tcp-probe
+          properties:
+            readinessProbe:
+              periodSeconds: 5
+              port: 6379
+            livenessProbe:
+              periodSeconds: 5
+              port: 6379
+        - name: patch-volume
+          properties:
+            volumeMounts:
+              - name: redis-data
+                path: "/data"
+        - name: patch-resources-limits
+          properties:
+            cpu: "125m"
+            memory: "256Mi"
