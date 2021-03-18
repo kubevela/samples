@@ -17,7 +17,7 @@ Application **boutique** is composed of 11 microservices and 1 worker. microserv
 
 ![Architecture of microservices](./images/architecture-diagram.png)
 
-### Apply WorkloadDefinition
+### Apply ComponentDefinition
 In this demo, we abstracted out 2 types of workload: [microservice](./Definitions/workloads/microservice.yaml) and [enhanced-worker](./Definitions/workloads/enhanced-worker.yaml).
 
 1. microservice: microservice describe a workload component Deployment with Service.
@@ -188,12 +188,13 @@ kubectl apply -f istio-canary/vs-split-traffic.yaml
 
 4. Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/) in web browser, access again to the **Online Boutique**, productcatalogservice-v2 introduces a 3-second latency into all server requests. So refresh the homepage a few times. You should notice that periodically, the frontend is slower to load.
 
-5. View traffic splitting in Kiali, this step you need install [Kiali](https://istio.io/latest/docs/setup/getting-started/#dashboard).
+5. View traffic splitting in Kiali, this step you need install [Kiali](https://istio.io/latest/docs/setup/getting-started/#dashboard) (Note you need `cd` the Istio package directory).
 
 ```
 istioctl dashboard kiali
 ```
-Open the Kiali dashboard. Please navigate to Service Graph > namespace: default and select "Versioned App Graph."You should see that approximately 75% of productcatalog requests are going to v1.
+Open the Kiali dashboard. Please navigate to Service Graph > namespace: default and select "Versioned App Graph."
+Select "Request Distribution" in "Display", you should see that approximately 75% of productcatalog requests are going to v1.
 
 ![kiali](./images/kiali.png)
 
