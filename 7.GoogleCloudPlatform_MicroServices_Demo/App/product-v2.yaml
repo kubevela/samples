@@ -1,0 +1,33 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: product
+  namespace: default
+  annotations:
+    app.oam.dev/revision-only: "true"
+spec:
+  components:
+    - name: productcatalogservice
+      type: enhanced-webservice
+      properties:
+        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/productcatalogservice:v0.1.3
+        port: 3550
+        addRevisionLabel: true
+        env:
+          - name: "PORT"
+            value: "3550"
+          - name: "EXTRA_LATENCY"
+            value: "3s"
+        cpu: "100m"
+        memory: "64Mi"
+      traits:
+        - type: patch-cmd-probe
+          properties:
+            readinessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:3550"]
+            livenessProbe:
+              cmd: ["/bin/grpc_health_probe", "-addr=:3550"]
+        - type: patch-resources-limits
+          properties:
+            cpu: "200m"
+            memory: "128Mi"

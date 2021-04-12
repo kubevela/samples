@@ -13,15 +13,29 @@ In this example, we will deploy the demo in the local k8s cluster **kind**.
 
 ## Deploy Application
 
-Application **boutique** is composed of 11 microservices and 1 worker. microservices provide shopping services, the worker(Load Generator) continuously sends requests imitating realistic user shopping flows to the frontend.
+**MicroServices-Demo** is composed of 11 microservices and 1 worker. microservices provide shopping services, the worker(Load Generator) 
+continuously sends requests imitating realistic user shopping flows to the frontend.
 
 ![Architecture of microservices](./images/architecture-diagram.png)
 
-### Apply ComponentDefinition
-In this demo, we abstracted out 2 types of workload: [microservice](./Definitions/workloads/microservice.yaml) and [enhanced-worker](./Definitions/workloads/enhanced-worker.yaml).
+while in this example, contains 2 versions microservice productcatalogservice which provides the information of products,
+we assume that productcatalogservice comes from a microservice managed by another team B, We don’t need to care about different versions of productcatalogservice.
+The management of productcatalogservice incoming traffic is managed by team B, So we can divide **MicroServices-Demo**into 2 Application:
 
-1. microservice: microservice describe a workload component Deployment with Service.
-2. enhanced-worker: enhanced-worker describe a long-running, scalable, containerized services that running at backend. They do NOT have network endpoint to receive external network traffic.
+1. Application **[boutique](./App/boutique.yaml)** contains 1 worker and 10 microservices(except productcatalogservice).
+2. Application **[product](./App/product-v1.yaml)** only contains productcatalogservice.
+
+we use **[AppDeployment](https://kubevela.io/docs/rollout/appdeploy)** to manage application **product**, **AppDeployment**
+allow multiple versions of components in a cluster.
+
+### Apply ComponentDefinition
+
+In this demo, we abstracted out 3 types of workload: [microservice](./Definitions/workloads/microservice.yaml), [enhanced-worker](./Definitions/workloads/enhanced-worker.yaml)
+and [enhanced-webservice](./Definitions/workloads/enhanced-webservice.yaml).
+
+1. microservice: microservice describes a workload component Deployment with Service.
+2. enhanced-worker: enhanced-worker describes a long-running, scalable, containerized services that running at backend. They do NOT have network endpoint to receive external network traffic.
+2. enhanced-webservice: enhanced-worker describes long-running, scalable, containerized services that have a stable network endpoint to receive external network traffic from customers.
 
 We register these workloads to Kubevela.
 
@@ -49,13 +63,35 @@ kubectl apply -f Definitions/traits
 
 ### Apply Application 
 
+1. Use ApplyDeployment to deploy different versions of Application product
 ```shell
-kubectl apply -f App/online-boutique-v1.yaml
+kubectl apply -f App/product-v1.yaml
+kubectl apply -f App/product-v2.yaml
+kubectl apply -f App/product-deployment.yaml
 ```
 
-Wait until the Appliaction status is `running`.
+Using kubectl get deployment, verify that the 2 version Deployment is READY.
+```shell
+$ kubectl get deployment
+NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+productcatalogservice-v1   1/1     1            1           112s
+productcatalogservice-v2   1/1     1            1           112s
+```
 
-```yaml
+2. Create an Istio VirtualService to split incoming productcatalog traffic between v1 (75%) and v2 (25%).
+
+```shell
+kubectl apply -f istio-canary/traffic.yaml
+```
+
+3. Apply Application boutique
+```shell
+kubectl apply -f App/boutique.yaml
+```
+
+Wait until the Appliaction status is running.
+
+```shell
 $ kubectl get application boutique -o yaml
 apiVersion: core.oam.dev/v1alpha2
 kind: Application
@@ -88,18 +124,17 @@ In the K8s cluster, you will see the following resources are created:
 ```shell
 $ kubectl get deployment
 NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
-adservice-v1               1/1     1            1           118s
-cartservice-v1             1/1     1            1           119s
-checkoutservice-v1         1/1     1            1           118s
-currencyservice-v1         1/1     1            1           119s
-emailservice-v1            1/1     1            1           118s
-frontend-v1                1/1     1            1           119s
-loadgenerator-v1           1/1     1            1           118s
-paymentservice-v1          1/1     1            1           118s
-productcatalogservice-v1   1/1     1            1           119s
-recommendationservice-v1   1/1     1            1           118s
-redis-cart-v1              1/1     1            1           117s
-shippingservice-v1         1/1     1            1           118s
+adservice                  1/1     1            1           106s
+cartservice                1/1     1            1           108s
+checkoutservice            1/1     1            1           107s
+currencyservice            1/1     1            1           107s
+emailservice               1/1     1            1           107s
+frontend                   1/1     1            1           108s
+loadgenerator              1/1     1            1           106s
+paymentservice             1/1     1            1           107s
+recommendationservice      1/1     1            1           107s
+redis-cart                 1/1     1            1           106s
+shippingservice            1/1     1            1           107s
 
 $ kubectl get service
 NAME                    TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
@@ -162,33 +197,11 @@ Then you can access the **Online Boutique** from [http://127.0.0.1:8080/](http:/
 ### Traffic Management
 In this section, we show the istio's traffic management capabilities. 
 
-1. Deploy ProductCatalog v2.
-```shell
-kubectl apply -f App/online-boutique-v2.yaml
-```
+1. when we apply application product, we have create VirtualService to split the incoming traffic,Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/) in web browser, 
+   access again to the **Online Boutique**, productcatalogservice-v2 introduces a 3-second latency into all server requests. So refresh the homepage a few times. 
+   You should notice that periodically, the frontend is slower to load.
 
-Using kubectl get deployment, verify that the v2 deployment is Running.
-```shell
-$ kubectl get deployment
-NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
-productcatalogservice-v1   1/1     1            1           5m23s
-productcatalogservice-v2   1/1     1            1           33s
-```
-
-2. Create an Istio DestinationRule for productcatalogservice.
-```shell
-kubectl apply -f istio-canary/destinationrule.yaml
-```
-
-3. Create an Istio VirtualService to split incoming productcatalog traffic between v1 (75%) and v2 (25%).
-
-```shell
-kubectl apply -f istio-canary/vs-split-traffic.yaml
-```
-
-4. Open [http://127.0.0.1:8080/](http://127.0.0.1:8080/) in web browser, access again to the **Online Boutique**, productcatalogservice-v2 introduces a 3-second latency into all server requests. So refresh the homepage a few times. You should notice that periodically, the frontend is slower to load.
-
-5. View traffic splitting in Kiali, this step you need install [Kiali](https://istio.io/latest/docs/setup/getting-started/#dashboard) (Note you need `cd` the Istio package directory).
+2. View traffic splitting in Kiali, this step you need install [Kiali](https://istio.io/latest/docs/setup/getting-started/#dashboard) (Note you need `cd` the Istio package directory).
 
 ```
 istioctl dashboard kiali
@@ -207,6 +220,8 @@ kubectl apply -f istio-canary/rollback.yaml
 ```shell
 $ kubectl delete -R --ignore-not-found -f .
 application.core.oam.dev "boutique" deleted
+appdeployment.core.oam.dev "product-appdeploy" deleted
+application.core.oam.dev "product" deleted
 traitdefinition.core.oam.dev "patch-annotations" deleted
 traitdefinition.core.oam.dev "patch-cmd-probe" deleted
 traitdefinition.core.oam.dev "patch-http-probe" deleted
@@ -214,10 +229,12 @@ traitdefinition.core.oam.dev "patch-loadbalancer" deleted
 traitdefinition.core.oam.dev "patch-resources-limits" deleted
 traitdefinition.core.oam.dev "patch-tcp-probe" deleted
 traitdefinition.core.oam.dev "patch-volume" deleted
-workloaddefinition.core.oam.dev "enhanced-worker" deleted
-workloaddefinition.core.oam.dev "microservice" deleted
-destinationrule.networking.istio.io "productcatalogservice" deleted
+componentdefinition.core.oam.dev "enhanced-webservice" deleted
+componentdefinition.core.oam.dev "enhanced-worker" deleted
+componentdefinition.core.oam.dev "microservice" deleted
 virtualservice.networking.istio.io "productcatalogservice" deleted
+service "productcatalogservice" deleted
+destinationrule.networking.istio.io "productcatalogservice" deleted
 gateway.networking.istio.io "frontend-gateway" deleted
 virtualservice.networking.istio.io "frontend-ingress" deleted
 virtualservice.networking.istio.io "frontend" deleted

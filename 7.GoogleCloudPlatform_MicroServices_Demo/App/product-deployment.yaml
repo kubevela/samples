@@ -1,0 +1,14 @@
+apiVersion: core.oam.dev/v1beta1
+kind: AppDeployment
+metadata:
+  name: product-appdeploy
+spec:
+  appRevisions:
+    - revisionName: product-v1
+      placement:
+        - distribution:
+            replicas: 1
+    - revisionName: product-v2
+      placement:
+        - distribution:
+            replicas: 1
