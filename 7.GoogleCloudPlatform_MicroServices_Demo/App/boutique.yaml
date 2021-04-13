@@ -1,4 +1,4 @@
-apiVersion: core.oam.dev/v1alpha2
+apiVersion: core.oam.dev/v1beta1
 kind: Application
 metadata:
   name: boutique
@@ -7,7 +7,7 @@ spec:
   components:
     - name: frontend
       type: microservice
-      settings:
+      properties:
         image: registry.cn-hangzhou.aliyuncs.com/vela-samples/frontend:v0.2.2
         servicePort: 80
         containerPort: 8080
@@ -23,11 +23,11 @@ spec:
         cpu: "100m"
         memory: "64Mi"
       traits:
-        - name: patch-annotations
+        - type: patch-annotations
           properties:
             annotations:
               sidecar.istio.io/rewriteAppHTTPProbers: "true"
-        - name: patch-http-probe
+        - type: patch-http-probe
           properties:
             readinessProbe:
               port: 8080
@@ -39,18 +39,18 @@ spec:
               path: "/_healthz"
               httpHeaders:
                 Cookie: "shop_session-id=x-liveness-probe"
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "200m"
             memory: "128Mi"
-        - name: patch-loadbalancer
+        - type: patch-loadbalancer
           properties:
             servicePort: 80
             containerPort: 8080
 
     - name: cartservice
       type: microservice
-      settings:
+      properties:
         image: registry.cn-hangzhou.aliyuncs.com/vela-samples/cartservice:v0.2.2
         servicePort: 7070
         env:
@@ -58,42 +58,21 @@ spec:
         cpu: "200m"
         memory: "64Mi"
       traits:
-        - name: patch-cmd-probe
+        - type: patch-cmd-probe
           properties:
             readinessProbe:
               cmd: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
             livenessProbe:
               periodSeconds: 10
               cmd: ["/bin/grpc_health_probe", "-addr=:7070", "-rpc-timeout=5s"]
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "300m"
             memory: "128Mi"
 
-    - name: productcatalogservice
-      type: microservice
-      settings:
-        image: registry.cn-hangzhou.aliyuncs.com/vela-samples/productcatalogservice:v0.2.2
-        servicePort: 3550
-        env:
-          PORT: "3550"
-        cpu: "100m"
-        memory: "64Mi"
-      traits:
-        - name: patch-cmd-probe
-          properties:
-            readinessProbe:
-              cmd: ["/bin/grpc_health_probe", "-addr=:3550"]
-            livenessProbe:
-              cmd: ["/bin/grpc_health_probe", "-addr=:3550"]
-        - name: patch-resources-limits
-          properties:
-            cpu: "200m"
-            memory: "128Mi"
-
     - name: currencyservice
       type: microservice
-      settings:
+      properties:
         image: registry.cn-hangzhou.aliyuncs.com/vela-samples/currencyservice:v0.2.2
         servicePort: 7000
         env:
@@ -101,20 +80,20 @@ spec:
         cpu: "100m"
         memory: "64Mi"
       traits:
-        - name: patch-cmd-probe
+        - type: patch-cmd-probe
           properties:
             readinessProbe:
               cmd: ["/bin/grpc_health_probe", "-addr=:7000"]
             livenessProbe:
               cmd: ["/bin/grpc_health_probe", "-addr=:7000"]
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "200m"
             memory: "128Mi"
 
     - name: paymentservice
       type: microservice
-      settings:
+      properties:
         image: registry.cn-hangzhou.aliyuncs.com/vela-samples/paymentservice:v0.2.2
         servicePort: 50051
         env:
@@ -122,20 +101,20 @@ spec:
         cpu: "100m"
         memory: "64Mi"
       traits:
-        - name: patch-cmd-probe
+        - type: patch-cmd-probe
           properties:
             readinessProbe:
               cmd: ["/bin/grpc_health_probe", "-addr=:50051"]
             livenessProbe:
               cmd: ["/bin/grpc_health_probe", "-addr=:50051"]
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "200m"
             memory: "128Mi"
 
     - name: shippingservice
       type: microservice
-      settings:
+      properties:
         image: registry.cn-hangzhou.aliyuncs.com/vela-samples/shippingservice:v0.2.2
         servicePort: 50051
         env:
@@ -143,20 +122,20 @@ spec:
         cpu: "100m"
         memory: "64Mi"
       traits:
-        - name: patch-cmd-probe
+        - type: patch-cmd-probe
           properties:
             readinessProbe:
               cmd: ["/bin/grpc_health_probe", "-addr=:50051"]
             livenessProbe:
               cmd: ["/bin/grpc_health_probe", "-addr=:50051"]
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "200m"
             memory: "128Mi"
 
     - name: emailservice
       type: microservice
-      settings:
+      properties:
         image: registry.cn-hangzhou.aliyuncs.com/vela-samples/emailservice:v0.2.2
         servicePort: 5000
         env:
@@ -165,7 +144,7 @@ spec:
         cpu: "100m"
         memory: "64Mi"
       traits:
-        - name: patch-cmd-probe
+        - type: patch-cmd-probe
           properties:
             readinessProbe:
               periodSeconds: 5
@@ -173,14 +152,14 @@ spec:
             livenessProbe:
               periodSeconds: 5
               cmd: ["/bin/grpc_health_probe", "-addr=:8080"]
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "200m"
             memory: "128Mi"
 
     - name: checkoutservice
       type: microservice
-      settings:
+      properties:
         image: registry.cn-hangzhou.aliyuncs.com/vela-samples/checkoutservice:v0.2.2
         servicePort: 5050
         env:
@@ -194,7 +173,7 @@ spec:
         cpu: "100m"
         memory: "64Mi"
       traits:
-        - name: patch-cmd-probe
+        - type: patch-cmd-probe
           properties:
             readinessProbe:
               periodSeconds: 5
@@ -202,14 +181,14 @@ spec:
             livenessProbe:
               periodSeconds: 5
               cmd: ["/bin/grpc_health_probe", "-addr=:5050"]
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "200m"
             memory: "128Mi"
 
     - name: recommendationservice
       type: microservice
-      settings:
+      properties:
         image: registry.cn-hangzhou.aliyuncs.com/vela-samples/recommendationservice:v0.2.2
         servicePort: 8080
         env:
@@ -218,7 +197,7 @@ spec:
         cpu: "100m"
         memory: "64Mi"
       traits:
-        - name: patch-cmd-probe
+        - type: patch-cmd-probe
           properties:
             readinessProbe:
               periodSeconds: 5
@@ -226,14 +205,14 @@ spec:
             livenessProbe:
               periodSeconds: 5
               cmd: ["/bin/grpc_health_probe", "-addr=:8080"]
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "200m"
             memory: "128Mi"
 
     - name: adservice
       type: microservice
-      settings:
+      properties:
         image: registry.cn-hangzhou.aliyuncs.com/vela-samples/adservice:v0.2.2
         servicePort: 9555
         env:
@@ -241,7 +220,7 @@ spec:
         cpu: "200m"
         memory: "180Mi"
       traits:
-        - name: patch-cmd-probe
+        - type: patch-cmd-probe
           properties:
             readinessProbe:
               periodSeconds: 15
@@ -249,14 +228,14 @@ spec:
             livenessProbe:
               periodSeconds: 15
               cmd: ["/bin/grpc_health_probe", "-addr=:9555"]
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "300m"
             memory: "300Mi"
 
     - name: loadgenerator
       type: enhanced-worker
-      settings:
+      properties:
         image: registry.cn-hangzhou.aliyuncs.com/vela-samples/loadgenerator:v0.2.2
         env:
           FRONTEND_ADDR: "frontend:80"
@@ -264,24 +243,24 @@ spec:
         cpu: "300m"
         memory: "256Mi"
       traits:
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "500m"
             memory: "512Mi"
 
     - name: redis-cart
       type: microservice
-      settings:
+      properties:
         image: redis:alpine
         servicePort: 6379
         cpu: "70m"
         memory: "200Mi"
       traits:
-        - name: patch-annotations
+        - type: patch-annotations
           properties:
             annotations:
               sidecar.istio.io/rewriteAppHTTPProbers: "true"
-        - name: patch-tcp-probe
+        - type: patch-tcp-probe
           properties:
             readinessProbe:
               periodSeconds: 5
@@ -289,12 +268,12 @@ spec:
             livenessProbe:
               periodSeconds: 5
               port: 6379
-        - name: patch-volume
+        - type: patch-volume
           properties:
             volumeMounts:
               - name: redis-data
                 path: "/data"
-        - name: patch-resources-limits
+        - type: patch-resources-limits
           properties:
             cpu: "125m"
             memory: "256Mi"
