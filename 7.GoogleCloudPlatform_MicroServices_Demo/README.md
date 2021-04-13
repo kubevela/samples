@@ -25,6 +25,8 @@ The management of productcatalogservice incoming traffic is managed by team B, S
 1. Application **[boutique](./App/boutique.yaml)** contains 1 worker and 10 microservices(except productcatalogservice).
 2. Application **[product](./App/product-v1.yaml)** only contains productcatalogservice.
 
+![Applications](./images/apps.png)
+
 we use **[AppDeployment](https://kubevela.io/docs/rollout/appdeploy)** to manage application **product**, **AppDeployment**
 allow multiple versions of components in a cluster.
 
