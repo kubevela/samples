@@ -1,17 +1,23 @@
 # Create Component from Scratch
 
-In this tutorial, we will build a simple web app component written in Python that you can use for testing.
+In this tutorial, we will build a simple web app component written in Python
+that you can use for testing.
 It reads in an env variable TARGET and prints “Hello \${TARGET}!“.
 If TARGET is not specified, it will use “World” as the TARGET.
 
 ## Prerequisites
 
-* Follow the instructions in the [installation](../setup/install.md) document to get Rudr installed on your Kubernetes cluster.
-* [Docker](https://www.docker.com/) installed and running on your local machine, and a [Docker Hub](https://hub.docker.com) account configured (we’ll use it for a container registry).
+* Follow the instructions in the
+[installation](https://kubevela.io/docs/install) document to get KubeVela
+installed.
+* [Docker](https://www.docker.com/) installed and running on your local machine,
+and a [Docker Hub](https://hub.docker.com) account configured (we’ll use it for
+a container registry).
 
 ## Steps to build image
 
-The following instructions will lead you to build an image from source, you can get all the files mentioned here in the [app](./app) folder.
+The following instructions will lead you to build an image from source, you can
+get all the files mentioned here in the [app](./app) folder.
 
 1. Create a new directory and cd into it:
     ```shell script
@@ -19,84 +25,116 @@ The following instructions will lead you to build an image from source, you can 
     cd app
     ```
 2. Create a file named `app.py` and copy the code from [`app/app.py`](./app/app.py)
-3. Create a file named `Dockerfile` and copy the code from [`app/Dockerfile`](./app/Dockerfile), See [official Python docker image](https://hub.docker.com/_/python/) for more details.
-4. Use Docker to build the sample code into a container. To build and push with Docker Hub, run these commands replacing `oamdev` with your Docker Hub username:
-    ```shell script
-   # Build the container on your local machine
-   docker build -t oamdev/helloworld-python:v1 .
+3. Create a file named `Dockerfile` and copy the code from
+   [`app/Dockerfile`](./app/Dockerfile), See [official Python docker
+   image](https://hub.docker.com/_/python/) for more details.
+4. Use Docker to build the sample code into a container. To build and push with
+   Docker Hub, run these commands replacing `oamdev` with your Docker Hub
+   username
 
-   # Push the container to docker registry
-   docker push oamdev/helloworld-python:v1
-    ```
+```shell script
+# Build the container on your local machine
+docker build -t oamdev/helloworld-python:v1 .
+
+# Push the container to docker registry
+docker push oamdev/helloworld-python:v1
+```
    
-## Create Component Schematics File
+## Choose ComponentDefinition 
 
-Now we have a docker image named `oamdev/helloworld-python:v1`, so we can use this image to create a component schematics file.
+Now we have a docker image named `oamdev/helloworld-python:v1`, so we can choose a 
+ComponentDefinition to use this image to setup an application.
 
-1. Choose the workloadType: the `helloworld-python` is very typical web application, it is stateless, always running as a service, can be replicated. So we use `core.oam.dev/v1alpha1.Server` without doubt.
-2. Fill the container spec and make ENV configurable: obviously we have two major environment variables in the image, one is TARGET and the other is PORT.
-3. Make parameters so we could let Application Configuration configure these environments.
+KubeVela provides several built-in ComponentDefinitions which can cover most
+common use cases.
+`helloworld-python` is a very typical web application, which is stateless,
+always running as a service, and can be replicated.
+So we can choose built-in `webservice` capability to deploy the application. 
 
-After these three concerns, we could figure out this basic component schematic yaml like below: 
+## (Optional) Create a ComponentDefinition
+
+KubeVela provides high extensibility for users to fulfill arbitrary
+capabilities.
+You can follow [this
+doc](https://kubevela.io/docs/platform-engineers/definition-and-templates) to
+learn more about `ComponentDefinition` including how create a ComponentDefinition
+satifying partifular schenarios from scratch.
+
+## Write Application file
+
+Once ComponentDefinition type is decided, we can write an Application file for
+deploying the application.
+Besides docker image, we also have two major environment variables, one is TARGET
+and the other is PORT, we should fill them in the component's properties.
 
 ```yaml
-apiVersion: core.oam.dev/v1alpha1
-kind: ComponentSchematic
+apiVersion: core.oam.dev/v1beta1
+kind: Application
 metadata:
-  name: helloworld-python-v1
+  name: first-app
 spec:
-  name: helloworld-python
-  workloadType: core.oam.dev/v1alpha1.Server
-  containers:
-    - name: foo
-      image: oamdev/helloworld-python:v1
-      env:
-        - name: TARGET
-          fromParam: target
-        - name: PORT
-          fromParam: port
-      ports:
-        - type: tcp
-          containerPort: 9999
-          name: http
-  parameters:
-    - name: target
-      type: string
-      default: World
-    - name: port
-      type: string
-      default: '9999'
+  components:
+    - name: helloworld
+      type: webservice
+      properties:
+        image: oamdev/helloworld-python:v1
+        env:
+          - name: "TARGET"
+            value: "KubeVela"
+        port: 8080
 ```
 
-Let's name it `helloworld-python-component.yaml` and put it into [the `examples` folder](./ComponentSchematic/helloworld-python-component.yaml).
+### Add Ingress trait
 
-Finally we could apply this yaml to the platform and let our operators to deploy it.
+In order to access the application from the outside of cluster, we can add a
+built-in `Ingress` trait for it.
+
+```yaml
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: first-app
+spec:
+  components:
+    - name: helloworld
+      type: webservice
+      properties:
+        image: oamdev/helloworld-python:v1
+        env:
+          - name: "TARGET"
+            value: "KubeVela"
+        port: 8080
+```
+
+Let's save it as file `app.yaml` and apply it to deploy.
 
 ```shell script
-$ kubectl apply -f ComponentSchematics/helloworld-python-component.yaml
-componentschematic.core.oam.dev/helloworld-python-v1 created
+$ kubectl apply -f app.yaml
 ```
 
-You can check if your component schematic is OK with:
+You can check if your component is OK with:
 
 ```shell script
-$ kubectl get comp
-NAME                   AGE
-helloworld-python-v1   15s
+$ kubectl get deploy
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+helloworld   1/1     1            1           54s
+
+$ curl localhost
+Hello KubeVela!
 ```
 
-Yeah, we have successfully built a component from source now.
+Yeah, we have successfully deploy an application from source now.
 
-## Upgrade the component
+## Upgrade the application
 
-We assume a component is immutable. If we want to upgrade a component,
-the easiest way is to modify the component and change the name suffix with a new version.
+If we want to upgrade an application, the easiest way is to modify the
+application components' properties. 
 
 ### Change the code 
 
 For example, we change the code from `Hello` to `Goodbye`.
 
-```shell script
+```python
 import os
 
 from flask import Flask
@@ -120,58 +158,41 @@ docker build -t oamdev/helloworld-python:v2 .
 docker push oamdev/helloworld-python:v2
 ``` 
 
-### Change the component
+### Change the component properties
 
-Change the component with a new name.
-
+Change the image tag to new one (v1 => v2).
 ```yaml
-apiVersion: core.oam.dev/v1alpha1
-kind: ComponentSchematic
+apiVersion: core.oam.dev/v1beta1
+kind: Application
 metadata:
-- name: helloworld-python-v1
-+ name: helloworld-python-v2
+  name: first-app
 spec:
-  name: helloworld-python
-  workloadType: core.oam.dev/v1alpha1.Server
-  containers:
-    - name: foo
--     image: oamdev/helloworld-python:v1
-+     image: oamdev/helloworld-python:v2
-
-      env:
-        - name: TARGET
-          fromParam: target
-        - name: PORT
-          fromParam: port
-      ports:
-        - type: tcp
-          containerPort: 9999
-          name: http
-  parameters:
-    - name: target
-      type: string
-      default: World
-    - name: port
-      type: string
-      default: '9999'
+  components:
+    - name: helloworld
+      type: webservice
+      properties:
+        image: oamdev/helloworld-python:v2 # new image tag
+        env:
+          - name: "TARGET"
+            value: "KubeVela"
+        port: 8080
+      traits:
+        - type: ingress
+          properties:
+            domain: localhost 
+            http:
+              /: 8080
 ```
 
-Apply the changed component:
+Apply the upgraded application:
 
 ```console
-$ kubectl apply -f examples/helloworld-python-component.yaml
-componentschematic.core.oam.dev/helloworld-python-v2 created
+$ kubectl apply -f app-upgrade.yaml 
 ```
 
 ### Check the result
 
-Now we have two components:
-
-```console
-$ kubectl get comp
-NAME                   AGE
-helloworld-python-v1   1h
-helloworld-python-v2   27s
+```shell script
+$ curl localhost
+Goodbye KubeVela!
 ```
-
-They could be used by operator in application configuration. A sample ApplicationConfiguration is given [here](./ApplicationConfiguration/ApplicationConfiguration.yaml) with an ingress trait.
