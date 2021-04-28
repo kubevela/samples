@@ -1,0 +1,20 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: first-app
+spec:
+  components:
+    - name: helloworld
+      type: webservice
+      properties:
+        image: oamdev/helloworld-python:v2
+        env:
+          - name: "TARGET"
+            value: "KubeVela"
+        port: 8080
+      traits:
+        - type: ingress
+          properties:
+            domain: localhost 
+            http:
+              /: 8080
