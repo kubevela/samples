@@ -1,0 +1,37 @@
+apiVersion: core.oam.dev/v1alpha2
+kind: ComponentDefinition
+metadata:
+  name: alibaba-website
+  annotations:
+    definition.oam.dev/description: Terraform Configuration to create an ECS, install Nginx and deploy a website in it.
+    type: terraform
+spec:
+  workload:
+    definition:
+      apiVersion: terraform.core.oam.dev/v1beta1
+      kind: Configuration
+  schematic:
+    terraform:
+      configuration: |
+        module "website" {
+          source = "github.com/zzxwill/nginx-web-on-ecs"
+
+          zone_id = var.zone_id
+          password = "PasefjsfdY123!"
+        }
+
+        variable "zone_id" {
+          description = "Zone ID"
+          type = string
+          default = "cn-beijing-i"
+        }
+
+        variable "password" {
+          description = "ECS instance password for root user"
+          type = string
+          default = "PasefjsfdY123!"
+        }
+
+        output "URL" {
+          value = module.website.console_url
+        }

@@ -1,0 +1,11 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: terraform-webapp
+spec:
+  components:
+    - name: website
+      type: alibaba-website
+      properties:
+        zone_id: cn-beijing-i
+        password: PasefjsfdY123!
