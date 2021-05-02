@@ -1,0 +1,105 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: service-tracker
+spec:
+  components:
+    - name: service-tracker-ui
+      type: webservice
+      properties:
+        image: sonofjorel/rudr-web-ui:0.49
+        port: 8080
+        env:
+          - name: FLIGHT_API_ROOT
+            value: "http://flight-api.default.svc.cluster.local:3003/"
+          - name: WEATHER_API_ROOT
+            value: "http://weather-api.default.svc.cluster.local:3015/"
+          - name: QUAKES_API_ROOT
+            value: "http://quakes-api.default.svc.cluster.local:3012/"
+      traits:
+        - type: ingress
+          properties:
+            domain: localhost
+            http:
+              /: 8080
+    - name: weather-api
+      type: enhanced-webservice
+      properties:
+        image: sonofjorel/rudr-weather-api:0.49
+        port: 3015
+        env:
+          - name: DATA_SERVICE_URI
+            value: "http://data-api.default.svc.cluster.local:3009/"
+      traits:
+        - type: scaler
+          properties:
+            replicas: 2
+    - name: quakes-api
+      type: enhanced-webservice
+      properties:
+        image: sonofjorel/rudr-quakes-api:0.49
+        port: 3012
+        env:
+          - name: DATA_SERVICE_URI
+            value: "http://data-api.default.svc.cluster.local:3009/"
+      traits:
+        - type: scaler
+          properties:
+            replicas: 2
+    - name: flight-api
+      type: enhanced-webservice
+      properties:
+        image: sonofjorel/rudr-flights-api:0.49
+        port: 3003
+        env:
+          - name: DATA_SERVICE_URI
+            value: "http://data-api.default.svc.cluster.local:3009/"
+      traits:
+        - type: scaler
+          properties:
+            replicas: 2
+    - name: tracker-postgres-db
+      type: enhanced-webservice
+      properties:
+        image: docker.io/postgres:9.6.17-alpine
+        serviceName: db-workload
+        port: 5432
+        env: 
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: "dbconnect"
+                key: username
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "dbconnect"
+                key: password
+          - name: POSTGRES_DB
+            value: "hackfest"
+    - name: data-api
+      type: enhanced-webservice
+      properties:
+        image: artursouza/rudr-data-api:0.50
+        port: 3009
+        env:
+          - name: DATABASE_USER
+            valueFrom:
+              secretKeyRef:
+                name: "dbconnect"
+                key: username
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "dbconnect"
+                key: password
+          - name: DATABASE_HOSTNAME
+            value: "tracker-postgres-db"
+          - name: DATABASE_NAME
+            value: "hackfest"
+          - name: DATABASE_PORT
+            value: "5432"
+          - name: DATABASE_DRIVER
+            value: "postgres"    
+          - name: DATABASE_OPTIONS
+            value: ""
