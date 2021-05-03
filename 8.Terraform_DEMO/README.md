@@ -95,7 +95,33 @@ spec:
 
 - Check the application
 
-![](./snapshot.jpg)
+```shell
+$ kubectl get application
+NAME               COMPONENT   TYPE              PHASE            HEALTHY   STATUS   AGE
+terraform-webapp   website     alibaba-website   healthChecking                      27m
+
+$ kubectl get components
+NAME      WORKLOAD-KIND   AGE
+website   Configuration   27m
+
+$ kubectl get Configuration website -o yaml
+apiVersion: terraform.core.oam.dev/v1beta1
+kind: Configuration
+metadata:
+  annotations:
+    app.oam.dev/generation: "0"
+    ...
+status:
+  outputs:
+    URL:
+      type: string
+      value: http://123.57.214.251
+  state: provisioned
+```
+
+Visit `http://123.57.214.251`.
+
+![](./8.1Website_on_ECS/snapshot.jpg)
 
 
 
