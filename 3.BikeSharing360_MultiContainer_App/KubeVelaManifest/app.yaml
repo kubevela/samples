@@ -1,0 +1,40 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: bikesharing
+spec:
+  components:
+    - name: bikesharing-ui
+      type: webservice
+      properties:
+        image: sowmyans/bikesharing-ui:v1
+        port: 80
+        env:
+          - name: profileapi
+            value: "http://bikesharing-profile-api"
+          - name: emailapi
+            value: "http://bikesharing-email-api"
+      traits:
+        - type: ingress
+          properties:
+            domain: bikesharing.com
+            http: 
+              "/": 80
+    - name: bikesharing-email-api
+      type: enhanced-webservice
+      properties:
+        image: sowmyans/bikesharing-email-api:v1
+        port: 80
+    - name: bikesharing-profile-api
+      type: enhanced-webservice
+      properties:
+        image: ryanmcintyre/bikesharing-profile-api:v1
+        port: 80
+        env:
+          - name: ASPNETCORE_ENVIRONMENT
+            value: "Production"
+    - name: bikesharing-feedback-api
+      type: enhanced-webservice
+      properties:
+        image: micya/bikesharing-feedback-api:v1
+        port: 80
