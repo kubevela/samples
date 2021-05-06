@@ -1,0 +1,17 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: bikesharing-sc
+spec:
+  components:
+    - name: bikesharing-sc-component-v1
+      type: webservice
+      properties:
+        image: wdfox/bikesharing-sc:v1
+        port: 80
+      traits:
+        - type: ingress
+          properties:
+            domain: bikesharing-sc.com
+            http: 
+              "/": 80
