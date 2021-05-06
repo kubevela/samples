@@ -1,7 +1,0 @@
-apiVersion: core.oam.dev/v1alpha2
-kind: WorkloadDefinition
-metadata:
-  name: postgresqlinstances.database.crossplane.io
-spec:
-  definitionRef:
-    name: postgresqlinstances.database.crossplane.io
