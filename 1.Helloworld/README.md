@@ -58,11 +58,11 @@ capabilities.
 You can follow [this
 doc](https://kubevela.io/docs/platform-engineers/definition-and-templates) to
 learn more about `ComponentDefinition` including how create a ComponentDefinition
-satifying partifular schenarios from scratch.
+satisfying particular scenarios from scratch.
 
 ## Write Application file
 
-Once ComponentDefinition type is decided, we can write an Application file for
+Once component type is decided, we can write an Application file for
 deploying the application.
 Besides docker image, we also have two major environment variables, one is TARGET
 and the other is PORT, we should fill them in the component's properties.
@@ -104,6 +104,12 @@ spec:
           - name: "TARGET"
             value: "KubeVela"
         port: 8080
+      traits:
+        - type: ingress
+          properties:
+            domain: localhost 
+            http:
+              /: 8080
 ```
 
 Let's save it as file `app.yaml` and apply it to deploy.
