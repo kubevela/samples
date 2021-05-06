@@ -1,0 +1,16 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: example-app
+  annotations:
+    scaler: 2 # this injects into the porperty of scaler trait
+spec:
+  components:
+    - name: example-component
+      type: webservice
+      properties:
+        image: nginx:latest
+      traits:
+        - type: scaler
+          properties:
+            replicas: 3

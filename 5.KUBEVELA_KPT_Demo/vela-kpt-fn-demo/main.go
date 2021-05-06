@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"sigs.k8s.io/kustomize/kyaml/kio"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
@@ -64,29 +65,25 @@ func inject(r *yaml.RNode) error {
 			return fmt.Errorf("%v: %s", err, s)
 		}
 		var changed = false
-		traits.VisitElements(func(node *yaml.RNode) error {
-
-			trait, err := node.Pipe(yaml.Lookup("trait"))
+		traits.VisitElements(func(curTrait *yaml.RNode) error {
+			traitType, err := curTrait.Pipe(yaml.Lookup("type"))
 			if err != nil {
 				s, _ := r.String()
 				return fmt.Errorf("%v: %s", err, s)
 			}
-			meta, _ := trait.GetMeta()
-			if meta.ApiVersion == "core.oam.dev/v1alpha2" && meta.Kind == "ManualScalerTrait" {
-				// set scaler
-				err := trait.PipeE(
-					// lookup resources.requests.cpu, creating the field as a
-					// ScalarNode if it doesn't exist
-					yaml.Lookup("spec", "replicaCount"),
-					// set the field value to the cpuSize
-					yaml.Set(yaml.NewScalarRNode(replicaNumber)))
-				if err != nil {
-					s, _ := r.String()
-					return fmt.Errorf("%v: %s", err, s)
-				}
-				changed = true
+			if typeName, _ := traitType.String(); !strings.HasPrefix(typeName, "scaler") {
+				return nil
 			}
-			node.PipeE(yaml.SetField("trait", trait))
+			properties, _ := curTrait.Pipe(yaml.Lookup("properties"))
+			if err := properties.PipeE(
+				yaml.Lookup("replicas"),
+				yaml.Set(yaml.NewScalarRNode(replicaNumber)),
+			); err != nil {
+				s, _ := r.String()
+				return fmt.Errorf("%v: %s", err, s)
+			}
+			changed = true
+			curTrait.PipeE(yaml.SetField("properties", properties))
 			return nil
 		})
 		if changed {
