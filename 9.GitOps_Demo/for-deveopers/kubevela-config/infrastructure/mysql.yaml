@@ -1,0 +1,36 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: mysql
+  namespace: default
+spec:
+  components:
+    - name: mysql-controller
+      type: helm
+      properties:
+        repoType: helm
+        url: https://presslabs.github.io/charts
+        chart: mysql-operator
+        version: "0.4.0"
+    - name: mysql-cluster
+      type: raw
+      properties:
+        apiVersion: mysql.presslabs.org/v1alpha1
+        kind: MysqlCluster
+        metadata:
+          name: mysql-cluster
+        spec:
+          replicas: 1
+          secretName: mysql-secret
+
+  workflow:
+    steps:
+      - name: deploy-operator
+        type: apply-component
+        properties:
+          component: mysql-controller
+      - name: deploy-mysql
+        type: apply-component
+        properties:
+          component: mysql-cluster
+

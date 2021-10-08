@@ -1,0 +1,16 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: apps
+spec:
+  components:
+  - name: apps
+    type: kustomize
+    properties:
+      repoType: git
+      url: https://github.com/FogDong/KubeVela-GitOps-Infra-Demo
+      secretRef: git-secret
+      pullInterval: 1m
+      git:
+        branch: main
+      path: ./apps

@@ -1,0 +1,26 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: my-app
+  namespace: default
+spec:
+  components:
+    - name: my-server
+      type: webservice
+      properties:
+        image: ghcr.io/fogdong/test-fog:master-cba5605f-1632714412
+        port: 8088
+        env:
+          - name: DB_HOST
+            value: mysql-cluster-mysql.default.svc.cluster.local:3306
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: ROOT_PASSWORD
+      traits:
+        - type: ingress
+          properties:
+            domain: testsvc.example.com
+            http:
+              /: 8088
