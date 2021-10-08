@@ -1,0 +1,16 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: infra
+spec:
+  components:
+  - name: database-config
+    type: kustomize
+    properties:
+      repoType: git
+      url: https://github.com/FogDong/KubeVela-GitOps-Infra-Demo
+      secretRef: git-secret
+      pullInterval: 10m
+      git:
+        branch: main
+      path: ./infrastructure
