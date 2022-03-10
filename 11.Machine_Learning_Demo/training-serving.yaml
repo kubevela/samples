@@ -1,0 +1,55 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: training-serving
+  namespace: default
+spec:
+  components:
+  # 训练模型
+  - name: demo-training
+    type: model-training
+    properties:
+      # 训练模型的镜像
+      image: fogdong/train-color:v1
+      # 模型训练的框架
+      framework: tensorflow
+      # 声明存储，将模型持久化。此处会使用集群内的默认 storage class 来创建 PVC
+      storage:
+        - name: "my-pvc"
+          mountPath: "/model"
+  
+  # 启动模型服务
+  - name: demo-serving
+    type: model-serving
+    # 模型服务会在模型训练完成后启动
+    dependsOn:
+      - demo-training
+    properties:
+      protocol: tensorflow
+      predictors:
+        - name: model
+          replicas: 1
+          graph:
+            # 模型名
+            name: my-model
+            # 模型框架
+            implementation: tensorflow
+            # 模型地址，上一步会将训练完的模型保存到 my-pvc 这个 pvc 当中，所以通过 pvc://my-pvc 指定模型的地址
+            modelUri: pvc://my-pvc
+
+  # 测试模型服务
+  - name: demo-rest-serving
+    type: webservice
+    dependsOn:
+      - demo-serving
+    properties:
+      image: fogdong/color-serving:v1
+      # 使用 LoadBalancer 暴露对外地址，方便调用
+      exposeType: LoadBalancer
+      env:
+        - name: URL
+          # 模型服务的地址
+          value: http://ambassador.vela-system.svc.cluster.local/seldon/default/demo-serving/v1/models/my-model:predict
+      ports:
+        - port: 3333
+          expose: true
