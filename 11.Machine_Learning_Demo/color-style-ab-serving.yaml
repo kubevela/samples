@@ -1,0 +1,49 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: color-style-ab-serving
+  namespace: default
+spec:
+  components:
+  - name: color-ab-serving
+    type: model-serving
+    properties:
+      protocol: tensorflow
+      predictors:
+        - name: model1
+          replicas: 1
+          graph:
+            name: my-model
+            implementation: tensorflow
+            modelUri: pvc://color-model/model/v2
+  - name: style-ab-serving
+    type: model-serving
+    properties:
+      protocol: tensorflow
+      timeout: "10000"
+      customRouting:
+        # 指定自定义 Header
+        header: "style: transfer"
+        # 指定自定义路由
+        serviceName: "color-ab-serving"
+      predictors:
+        - name: model2
+          replicas: 1
+          graph:
+            name: my-model
+            implementation: tensorflow
+            modelUri: pvc://style-model/model
+  - name: ab-rest-serving
+    type: webservice
+    dependsOn:
+      - color-ab-serving
+      - style-ab-serving
+    properties:
+      image: fogdong/style-serving:v1
+      exposeType: LoadBalancer
+      env:
+        - name: URL
+          value: http://ambassador.vela-system.svc.cluster.local/seldon/default/color-ab-serving/v1/models/my-model:predict
+      ports:
+        - port: 3333
+          expose: true

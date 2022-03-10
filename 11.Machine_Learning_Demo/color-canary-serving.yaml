@@ -1,0 +1,39 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: color-serving
+  namespace: default
+spec:
+  components:
+  - name: color-model-serving
+    type: model-serving
+    properties:
+      protocol: tensorflow
+      predictors:
+        - name: model1
+          replicas: 1
+          traffic: 50
+          graph:
+            name: my-model
+            implementation: tensorflow
+            modelUri: pvc://color-model/model/v1
+        - name: model2
+          replicas: 1
+          traffic: 50
+          graph:
+            name: my-model
+            implementation: tensorflow
+            modelUri: pvc://color-model/model/v2
+  - name: color-rest-serving
+    type: webservice
+    dependsOn:
+      - color-model-serving
+    properties:
+      image: fogdong/color-serving:v1
+      exposeType: LoadBalancer
+      env:
+        - name: URL
+          value: http://ambassador.vela-system.svc.cluster.local/seldon/default/color-model-serving/v1/models/my-model:predict
+      ports:
+        - port: 3333
+          expose: true

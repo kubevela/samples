@@ -1,0 +1,17 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: color-model
+  namespace: default
+spec:
+  components:
+  - name: cp-color-model
+    type: task
+    properties:
+      image: fogdong/color-model
+    traits:
+      - type: storage
+        properties:
+          pvc:
+            - name: color-model
+              mountPath: /mnt
