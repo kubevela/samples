@@ -1,0 +1,13 @@
+apiVersion: core.oam.dev/v1alpha1
+kind: Policy
+metadata:
+  name: override-high-availability
+  namespace: default
+type: override
+properties:
+  components:
+    - type: webservice
+      traits:
+      - type: scaler
+        properties:
+          replicas: 5

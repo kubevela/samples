@@ -68,6 +68,7 @@ Please install KubeVela as per the instructions [here](https://kubevela.io/docs/
 | [9. GitOps Demo](./9.GitOps_Demo) | This is an example to use KubeVela in a GitOps way. The example will show you how to update the config in Git repo to trigger automated re-deployment. |
 | [10. Nocalhost Demo](./10.Nocalhost_Demo) | This is an example to use KubeVela with Nocalhost. The example will show you how to debug in local environment with Nocalhost and KubeVela. |
 | [11. Machine Learning Demo](./11.Machine_Learning_Demo) | This is an example to train and serve model with KubeVela. The example will show you how to use KubeVela AI addon. |
+| [12. Multi-Cluster Demo](./12.Multi_Cluster_Demo) | This is an example to KubeVela for managing and deploying application into multi-clusters. It includes the major features from version 1.3.|
 
 To get started with the samples, clone this repository and follow instructions in each sample:
 ```bash

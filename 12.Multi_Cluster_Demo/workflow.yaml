@@ -1,0 +1,14 @@
+apiVersion: core.oam.dev/v1alpha1
+kind: Workflow
+metadata:
+  name: deploy-hello-world
+  namespace: default
+steps:
+  - type: deploy
+    name: deploy-beijing
+    properties:
+      policies: ["beijing-clusters"]
+  - type: deploy
+    name: deploy-aws
+    properties:
+      policies: ["override-high-availability","topology-aws"]
