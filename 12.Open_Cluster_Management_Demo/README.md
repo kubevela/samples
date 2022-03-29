@@ -4,6 +4,8 @@ This is a simple version of demo for KubeCon China topic **"Build and Manage Mul
 
 In this guide, you can setup a simple multi-cluster application with KubeVela and OCM. If you would like to re-implement the full demo (including advanced features such as GitOps and Cloud Resource), you can read [Advanced Doc](https://github.com/wonderflow/ocm-kubevela-demo/tree/advanced) for more details.
 
+![DEMO](./demo.gif)
+
 ## Prerequisite
 
 ### Preparation
@@ -20,7 +22,7 @@ NAME                            CHART VERSION           APP VERSION             
 
 ### Installation
 
-1. Install KubeVela on your control plane (kubernetes cluster).
+##### 1. Install KubeVela on your control plane (kubernetes cluster).
 
 ```shell
 $ helm install \
@@ -31,7 +33,7 @@ $ helm install \
     --wait
 ```
 
-2. Check the installation of the KubeVela operator.
+##### 2. Check the installation of the KubeVela operator.
 
 ```shell
 $ kubectl -n vela-system get pod
@@ -40,7 +42,7 @@ kubevela-cluster-gateway-79d785cc89-rpcfk   1/1     Running   0          56m
 kubevela-vela-core-85644b9fb4-qxzbb         1/1     Running   0          56m
 ```
 
-3. Install Vela CLI on your computer.
+##### 3. Install Vela CLI on your computer.
 
 ```shell
 $ brew install kubevela
@@ -53,7 +55,7 @@ Version: refs/tags/v1.3.0
 
 #### Install OCM hub cluster control plane
 
-1. Enabling OCM addons for setting up multi-cluster control plane:
+##### 1. Enabling OCM addons for setting up multi-cluster control plane:
 
 ```shell
 $ vela addon enable ocm-hub-control-plane 
@@ -63,7 +65,7 @@ $ vela addon status ocm-hub-control-plane
 addon ocm-hub-control-plane status is enabled
 ```
 
-2. Check the OCM installation on multi-cluster control plane
+##### 2. Check the OCM installation on multi-cluster control plane
 
 ```shell
 $ kubectl -n open-cluster-management get deployment
@@ -78,7 +80,31 @@ cluster-manager-hub-registration-webhook      3/3     3            3           3
 cluster-manager-hub-work-webhook              3/3     3            3           3m42s
 ```
 
-3. Joining a managed cluster to the OCM control plane:
+##### 3. Install OCM cluster-gateway addons
+
+Note that the following steps will restart the existing cluster-gateway apiserver instances.
+
+##### Installing addons
+
+```shell
+# install the addons
+$ vela addon enable ocm-gateway-manager-addon
+Addon: ocm-gateway-manager-addon enabled Successfully.
+
+$ vela addon status ocm-gateway-manager-addon
+addon ocm-gateway-manager-addon status is enabled 
+
+$ kubectl -n open-cluster-management-addon   get pod
+NAME                                                    READY   STATUS    RESTARTS   AGE
+cluster-gateway-addon-manager-766fbdb7c4-pcl2l          1/1     Running   0          10m
+cluster-proxy-58d7554c85-4swfg                          1/1     Running   0          10m
+cluster-proxy-58d7554c85-cmlgx                          1/1     Running   0          10m
+cluster-proxy-58d7554c85-vjnl6                          1/1     Running   0          10m
+cluster-proxy-addon-manager-646b7dd765-rxtd9            1/1     Running   0          10m
+managed-serviceaccount-addon-manager-69d665f7f9-pbg6c   1/1     Running   0          10m
+```
+
+##### 4. Joining a managed cluster to the OCM control plane:
 
 ```shell
 $ vela cluster join \
@@ -98,25 +124,15 @@ Successfully add cluster my-cluster, endpoint: <ManagedCluster IP>.
 $ vela cluster list
 CLUSTER         TYPE                            ENDPOINT
 my-cluster      OCM ManagedServiceAccount       - 
-```
 
-Note that `--in-cluster-boostrap=false` is not required when the joining member 
-cluster can directly access the hub cluster in a flattened network. e.g. in the
-same VPC.
-
-4. Install OCM addons
-
-##### Installing addons
-
-```shell
-# install the addons
-$ vela addon enable ocm-gateway-manager-addon
 # check addon installation
+# addons will be automatically installed by addon-managers
 $ kubectl get managedclusteraddon -n my-cluster
 NAMESPACE           NAME                    AVAILABLE   DEGRADED   PROGRESSING
 my-cluster          cluster-proxy           True     
 my-cluster          managed-serviceaccount  True     
 my-cluster          cluster-gateway         True  
+
 # check gateway api registration
 $ kubectl get clustergateway
 NAME       PROVIDER   CREDENTIAL-TYPE       ENDPOINT-TYPE
@@ -124,7 +140,13 @@ my-cluster              ServiceAccountToken   ClusterProxy
 $ kubectl get --raw="/apis/cluster.core.oam.dev/v1alpha1/clustergateways/my-cluster/proxy/healthz"
 ```
 
+Note that `--in-cluster-boostrap=false` is not required when the joining member 
+cluster can directly access the hub cluster in a flattened network. e.g. in the
+same VPC.
+
 ## Deploy your multi-cluster application
+
+##### 1. Creates an nginx application
 
 ```shell
 $ cat <<EOF | kubectl apply -f -
@@ -159,7 +181,7 @@ spec:
 EOF
 ```
 
-2. Check application status
+##### 2. Check application status
 
 ```shell
 vela status nginx
@@ -189,19 +211,19 @@ Services:
     Traits:
 ```
 
-3. Check running logs
+##### 3. Check running logs
 
 ```shell
 vela logs nginx
 ```
 
-4. Enter the pods:
+##### 4. Enter the pods:
 
 ```shell
 vela exec nginx -i -t -- /bin/sh
 ```
 
-5. Port forward your app:
+##### 5. Port forward your app:
 
 ```shell
 vela port-forward nginx
