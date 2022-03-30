@@ -30,5 +30,22 @@ spec:
       properties:
         clusterSelector:
           provider: AWS
+    -  type: override
+       name: override-high-availability
+       properties:
+          components:
+            - type: webservice
+              traits:
+              - type: scaler
+                properties:
+                  replicas: 5
   workflow:
-    ref: deploy-hello-world
+    steps:
+      - type: deploy
+        name: deploy-beijing
+        properties:
+          policies: ["beijing-clusters"]
+      - type: deploy
+        name: deploy-aws
+        properties:
+          policies: ["override-high-availability","topology-aws"]
