@@ -28,7 +28,7 @@ spec:
     - type: topology
       name: topology-aws
       properties:
-        clusterSelector:
+        clusterLabelSelector:
           provider: AWS
     -  type: override
        name: override-high-availability
