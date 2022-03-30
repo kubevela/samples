@@ -1,0 +1,51 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: example-app
+  namespace: default
+spec:
+  components:
+    - name: hello-world-server
+      type: webservice
+      properties:
+        image: crccheck/hello-world
+        port: 8000
+      traits:
+        - type: scaler
+          properties:
+            replicas: 3
+        - type: gateway
+          properties:
+            domain: testsvc-mc.example.com
+            class: ingress
+            http:
+              "/": 8000
+  policies:
+    - type: topology
+      name: beijing-clusters
+      properties:
+        clusters: ["beijing-1","beijing-2"]
+    - type: topology
+      name: topology-aws
+      properties:
+        clusterLabelSelector:
+          provider: AWS
+    -  type: override
+       name: override-high-availability
+       properties:
+          components:
+            - type: webservice
+              traits:
+              - type: scaler
+                properties:
+                  replicas: 5
+  workflow:
+    steps:
+      - type: deploy
+        name: deploy-beijing
+        properties:
+          policies: ["beijing-clusters"]
+      - type: deploy
+        name: deploy-aws
+        properties:
+          policies: ["override-high-availability","topology-aws"]
