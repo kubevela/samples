@@ -17,7 +17,7 @@ spec:
         - type: gateway
           properties:
             domain: testsvc-mc.example.com
-            class: ingress
+            # classInSpec : true   如果你所下发的集群里有安装 v1.20 以下版本的 Kubernetes ，请加上这个字段
             http:
               "/": 8000
   policies:
