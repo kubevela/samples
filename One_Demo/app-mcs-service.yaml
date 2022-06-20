@@ -1,0 +1,77 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: across-service-demo
+  namespace: examples
+spec:
+  components:
+    - name: user
+      type: ref-objects
+      properties:
+        objects:
+          - resource: deployment
+            name: user
+          - resource: service
+            name: user
+      traits:
+      - type: expose-service
+        properties:
+          name: production
+    - name: production
+      type: ref-objects
+      properties:
+        objects:
+          - resource: deployment
+            name: production
+          - resource: service
+            name: production
+      traits:
+      - type: expose-service
+        properties:
+          name: production
+    - name: viewer
+      type: ref-objects
+      properties:
+        objects:
+          - resource: deployment
+            name: viewer
+      traits:
+      - type: import-services
+        properties:
+          services:
+          - name: user
+            type: ClusterSetIP
+            ports: 
+            - port: 9000
+          - name: production
+            type: ClusterSetIP
+            ports: 
+            - port: 9000
+            
+  policies:
+    - name: topology-hangzhou
+      type: topology
+      properties:
+        clusterLabelSelector:
+          region: hangzhou
+    - name: topology-beijing
+      type: topology
+      properties:
+        clusterLabelSelector:
+          region: beijing
+    - name: override-beijing
+      type: override
+      properties:
+        selector: ["user", "production"]
+    - name: override-hangzhou
+      type: override
+      properties:
+        selector: ["viewer"]
+  workflow:
+    steps:
+    - type: deploy
+      properties:
+        policies: ["topology-beijing", "override-beijing"]
+    - type: deploy
+      properties:
+        policies: ["topology-hangzhou", "override-hangzhou"]
