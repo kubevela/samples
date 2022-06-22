@@ -1,6 +1,6 @@
 Flask==2.0.2
 matplotlib==3.5.1
-numpy==1.18.3
+numpy==1.22.0
 Pillow==9.0.1
 requests==2.27.1
 scikit_image==0.19.2
