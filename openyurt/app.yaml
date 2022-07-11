@@ -1,0 +1,44 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: yurt-app
+spec:
+  components:
+    - name: redis
+      type: yurt-helm
+      properties:
+        repoType: "helm"
+        url: "https://charts.bitnami.com/bitnami"
+        chart: "redis"
+        version: "16.8.5"
+        values:
+          customNodeSelectorLabel: "apps.openyurt.io/nodepool"
+  policies:
+    - name: override-beijing
+      type: override
+      properties:
+        components:
+          - name: redis
+            properties:
+              subset: beijing
+              values:
+                customodeSelectorValues: ["beijing"]
+    - name: override-hangzhou
+      type: override
+      properties:
+        components:
+          - name: redis
+            properties:
+              subset: hangzhou
+              values:
+                customodeSelectorValues: ["hangzhou"]
+  workflow:
+    steps:
+      - name: deploy2beijing
+        type: deploy
+        properties:
+          policies: ["override-beijing"]
+      - name: deploy2hangzhou
+        type: deploy
+        properties:
+          policies: ["override-hangzhou"]

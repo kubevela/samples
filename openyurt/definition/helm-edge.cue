@@ -3,7 +3,7 @@
 		workload: type: "autodetects.core.oam.dev"
 		status: {
 			healthPolicy: #"""
-				isHealth: len(context.outputs.release.status.conditions) != 0 && context.outputs.release.status.conditions[0]["status"]=="True
+				isHealth: len(context.outputs.release.status.conditions) != 0 && context.outputs.release.status.conditions[0]["status"]=="True"
 				"""#
 			customStatus: #"""
 					repoMessage:    *"" | string
@@ -50,7 +50,7 @@ template: {
 	output: {
 		apiVersion: "source.toolkit.fluxcd.io/v1beta2"
 		metadata: {
-			name: context.name + parameter.subnet
+			name: context.name + parameter.subset
 		}
 		if parameter.repoType == "git" {
 			kind: "GitRepository"
@@ -93,7 +93,7 @@ template: {
 		apiVersion: "helm.toolkit.fluxcd.io/v2beta1"
 		kind:       "HelmRelease"
 		metadata: {
-			name: context.name + parameter.subnet
+			name: context.name + parameter.subset
 		}
 		spec: {
 			timeout:  parameter.installTimeout
@@ -112,7 +112,7 @@ template: {
 						if parameter.repoType == "oss" {
 							kind: "Bucket"
 						}
-						name: context.name + parameter.subnet
+						name: context.name + parameter.subset
 					}
 					interval: parameter.interval
 					if parameter["valuesFiles"] != _|_ {
@@ -161,7 +161,7 @@ template: {
 
 	parameter: {
 
-		subnet: *"" | string
+		subset: *"" | string
 
 		repoType: *"helm" | "git" | "oss" | "oci"
 		// +usage=The interval at which to check for repository/bucket and release updates, default to 5m
