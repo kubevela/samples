@@ -1,0 +1,7 @@
+# Reference: https://github.com/kubevela/kubevela/blob/v1.3.5/docs/examples/vela.yaml
+name: first-vela-app
+services:
+  testsvc:
+    type: webservice
+    image: crccheck/hello-world
+    port: 8000

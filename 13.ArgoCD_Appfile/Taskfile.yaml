@@ -1,0 +1,59 @@
+version: "3"
+
+env:
+  ARGO_PROXY_PORT: 8080
+
+tasks:
+  infra:deploy:
+    deps:
+      - infra:check-deps
+    dir: deployments/infra
+    cmds:
+      - helmfile apply
+
+  infra:check-deps:
+    cmds:
+      - |
+        helm plugin list | grep diff > /dev/null || (echo "Missing dependency: Helm / helm-diff" && exit 1)
+      - |
+        which helmfile > /dev/null || (echo "Missing dependency: Helmfile" && exit 1)
+    silent: true
+
+  infra:destroy:
+    dir: deployments/infra
+    cmds:
+      - helmfile destroy
+
+  argo:proxy:
+    cmds:
+      - kubectl port-forward -n argo-system service/argo-cd-argocd-server "${ARGO_PROXY_PORT}:443"
+
+  argo:login:
+    vars:
+      PASSWORD:
+        sh: kubectl -n argo-system get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+    cmds:
+      - cmd: |
+          echo "ArgoCD Username: admin / Password: {{.PASSWORD}}"
+        silent: true
+      - cmd: argocd login --insecure "localhost:${ARGO_PROXY_PORT}" --username=admin --password="{{.PASSWORD}}"
+        silent: true
+
+  argo:create-vela-app:
+    vars:
+      APP_NAME: first-vela-app
+      APPFILE_DIR: ./sample
+      APPFILE_NAME: appfile.yaml
+      NAMESPACE: default
+      REPO: https://github.com/devholic/argocd-kubevela-appfile
+      REVISION: main
+    cmds:
+      - |
+        argocd app create "{{.APP_NAME}}" \
+          --dest-namespace="{{.NAMESPACE}}" \
+          --dest-server=https://kubernetes.default.svc \
+          --config-management-plugin=vela \
+          --plugin-env="APPFILE_PATH={{.APPFILE_NAME}}" \
+          --repo="{{.REPO}}" \
+          --path="{{.APPFILE_DIR}}" \
+          --revision="{{.REVISION}}"

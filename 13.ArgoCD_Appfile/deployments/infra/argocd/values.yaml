@@ -1,0 +1,53 @@
+applicationSet:
+  enabled: false
+
+dex:
+  enabled: false
+
+server:
+  configEnabled: true
+  config:
+    configManagementPlugins: |
+      - name: vela
+        init:
+          command: ["vela", "traits"]
+        generate:
+          command: ["sh"]
+          args:
+            - -c
+            - |
+              vela export -f "${APPFILE_PATH}"
+
+repoServer:
+  clusterAdminAccess:
+    enabled: true
+  volumes:
+    - emptyDir: {}
+      name: custom-tools
+  volumeMounts:
+    - mountPath: /usr/local/bin/vela
+      name: custom-tools
+      subPath: vela
+  initContainers:
+    - command:
+        - bash
+        - -c
+        - |
+          #!/usr/bin/env bash
+          set -eo pipefail
+          curl -fsSl https://kubevela.io/script/install.sh | bash -s 1.3.5
+      image: nginx:1.21.6 # To use bash + curl
+      name: kubevela
+      env:
+        - name: VELA_INSTALL_DIR
+          value: /custom-tools
+      resources:
+        limits:
+          cpu: 50m
+          memory: 64Mi
+        requests:
+          cpu: 10m
+          memory: 32Mi
+      volumeMounts:
+        - mountPath: /custom-tools
+          name: custom-tools

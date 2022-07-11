@@ -1,0 +1,21 @@
+repositories:
+  - name: argo
+    url: https://argoproj.github.io/argo-helm
+  - name: kubevela
+    url: https://charts.kubevela.net/core
+
+helmDefaults:
+  wait: true
+
+releases:
+  - name: argo-cd
+    namespace: argo-system
+    chart: argo/argo-cd
+    version: v4.6.5
+    values:
+      - ./argocd/values.yaml
+  - name: kubevela
+    namespace: vela-system
+    chart: kubevela/vela-core
+    version: v1.3.5
+    disableValidationOnInstall: true
