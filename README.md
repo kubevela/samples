@@ -69,6 +69,7 @@ Please install KubeVela as per the instructions [here](https://kubevela.io/docs/
 | [10. Nocalhost Demo](./10.Nocalhost_Demo) | This is an example to use KubeVela with Nocalhost. The example will show you how to debug in local environment with Nocalhost and KubeVela. |
 | [11. Machine Learning Demo](./11.Machine_Learning_Demo) | This is an example to train and serve model with KubeVela. The example will show you how to use KubeVela AI addon. |
 | [12. Multi-Cluster Demo](./12.Multi_Cluster_Demo) | This is an example to KubeVela for managing and deploying application into multi-clusters. It includes the major features from version 1.3.|
+| [13. ArgoCD Appfile Demo](./13.ArgoCD_Appfile_Demo) | This is an example to deploy application written in Appfile format using [Argo CD](https://github.com/argoproj/argo-cd). |
 
 To get started with the samples, clone this repository and follow instructions in each sample:
 ```bash
