@@ -1,0 +1,74 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: demo2
+spec:
+  components:
+    - name: catalog
+      properties:
+        envVersion: 8-jdk8
+        warURL: https://static.kubevela.net/example/java-example/nanoservice/catalog.war
+      type: java-war
+    - name: customer
+      properties:
+        envVersion: 8-jdk8
+        warURL: https://static.kubevela.net/example/java-example/nanoservice/customer.war
+      type: java-war
+    - dependsOn:
+        - catalog
+        - customer
+      name: order-web
+      properties:
+        env:
+          - name: CATALOG_HOST
+            value: catalog
+          - name: CUSTOMER_HOST
+            value: customer
+        envVersion: 8-jdk8
+        javaOpts: -Xms512m -Xmx512m -Xss256K
+        warURL: https://static.kubevela.net/example/java-example/nanoservice/order.war
+      type: java-war
+      traits:
+        - type: gateway
+          properties:
+            class: traefik
+            domain: 47.251.8.82.nip.io
+            http:
+              "/order": 8080
+  policies:
+    - name: target-default
+      type: topology
+      properties:
+        # The cluster with name local is installed the KubeVela.
+        clusters: ["local"]
+        namespace: "default"
+    - name: target-prod
+      type: topology
+      properties:
+        # If you don't have a remote cluster, just use local and change the namespace to a different one
+        #clusters: ["local"]
+        clusters: ["remote"]
+        # This namespace must be created before deploying.
+        namespace: "default"
+    - name: override-prod-gateway
+      type: override
+      properties:
+        components:
+          - name: order-web
+            traits:
+              - type: gateway
+                properties:
+                  # override the domain with the managed cluster IP
+                  domain: 116.62.199.204.nip.io
+  workflow:
+    steps:
+      - name: deploy2default
+        type: deploy
+        properties:
+          policies: ["target-default"]
+      - name: manual-approval
+        type: suspend
+      - name: deploy2prod
+        type: deploy
+        properties:
+          policies: ["target-prod", "override-prod-gateway"]
