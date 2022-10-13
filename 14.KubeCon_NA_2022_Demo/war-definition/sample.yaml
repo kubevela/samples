@@ -1,0 +1,19 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: kubecon-demo
+spec:
+  components:
+    - name: hello-world
+      properties:
+        envVersion: 8-jdk8
+        replicas: 1
+        warURL: https://github.com/wonderflow/kubecon-na-2022-demo/raw/main/war-definition/sample.war
+      type: java-war
+      traits:
+        - type: gateway
+          properties:
+            class: traefik
+            domain: 47.251.8.82.nip.io
+            http:
+              "/sample": 8080
