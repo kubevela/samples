@@ -1,4 +1,4 @@
-Flask==2.0.2
+Flask==2.2.5
 matplotlib==3.5.1
 numpy==1.22.0
 Pillow==9.3.0
