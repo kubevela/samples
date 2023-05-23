@@ -3,4 +3,4 @@ numpy==1.22.0
 Pillow==9.3.0
 requests==2.31.0
 scikit_image==0.19.2
-tensorflow==2.9.3
+tensorflow==2.11.1
