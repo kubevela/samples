@@ -1,0 +1,57 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wordpress-config
+type: Opaque
+stringData:
+  DB_DATABASE: wordpress
+  DB_USER: wordpress
+  DB_PASSWORD: wordpress-password
+  DB_HOST: wordpress-db
+  DB_PORT: 3306
+  WORDPRESS_USER: admin
+  WORDPRESS_PASSWORD: admin-password
+---
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: wordpress
+spec:
+  policies:
+  - type: global-variables
+    properties: 
+       discover:
+          secret:
+              name: wordpress-config
+  components:
+    - name: wordpress-db
+      type: helm
+      properties:
+        repoType: "helm"
+        url: https://charts.bitnami.com/bitnami
+        chart: mysql
+        version: 9.2.0
+        values:
+          auth: 
+            username: context.variables.DB_USER
+            database: context.variables.DB_DATABASE
+            password: context.variables.DB_PASSWORD
+    - name: wordpress-server
+      type: helm
+      dependsOn: ["wordpress-db"]
+      properties:
+        repoType: "helm"
+        url: "https://charts.bitnami.com/bitnami"
+        chart: "wordpress"
+        version: "1.0.0"
+        values:
+          wordpressUsername: context.variables.WORDPRESS_USER
+          wordpressPassword: context.variables.WORDPRESS_PASSWORD
+          externalDatabase: 
+            host: context.variables.DB_HOST
+            port: context.variables.DB_PORT
+            user: context.variables.DB_USER
+            password: context.variables.DB_PASSWORD
+            database: context.variables.DB_DATABASE
+          
