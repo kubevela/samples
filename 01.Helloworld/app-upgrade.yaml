@@ -13,7 +13,7 @@ spec:
             value: "KubeVela"
         port: 8080
       traits:
-        - type: ingress
+        - type: gateway
           properties:
             domain: localhost 
             http:
