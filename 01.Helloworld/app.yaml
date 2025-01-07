@@ -7,14 +7,15 @@ spec:
     - name: helloworld
       type: webservice
       properties:
-        image: oamdev/helloworld-python:v1
+        image: <your_docker_hub_username>/helloworld-python:v1
         env:
           - name: "TARGET"
             value: "KubeVela"
         port: 8080
       traits:
-        - type: ingress
+        - type: gateway
           properties:
             domain: localhost 
             http:
-              /: 8080
+            - path: "/"
+              port: 8080
