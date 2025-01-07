@@ -34,8 +34,7 @@ get all the files mentioned here in the [app](./app) folder.
     ```
     This would direct you to click enter and it would open up a browser. Login to your Docker Hub account on the browser and the control would come back to CLI. You would get a success message if login was completed.
 5. Use Docker to build the sample code into a container. To build and push with
-   Docker Hub, run these commands replacing `oamdev` with your Docker Hub
-   username
+   Docker Hub, run these commands after updating your Docker Hub Username.
 
 ```shell script
 # Build the container on your local machine
@@ -46,7 +45,7 @@ docker build -t $docker_hub_username/helloworld-python:v1 .
 docker push $docker_hub_username/helloworld-python:v1
 ```
 
-Now we have a docker image tagged `<your_docker_username/helloworld-python:v1`. 
+Now we have a docker image tagged `<your_docker_username>/helloworld-python:v1`. 
 
 ## Determine Component Type 
 
