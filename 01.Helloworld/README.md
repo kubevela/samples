@@ -28,19 +28,25 @@ get all the files mentioned here in the [app](./app) folder.
 3. Create a file named `Dockerfile` and copy the code from
    [`app/Dockerfile`](./app/Dockerfile), See [official Python docker
    image](https://hub.docker.com/_/python/) for more details.
-4. Use Docker to build the sample code into a container. To build and push with
+4. Login to your Docker Hub account, using the below command. 
+    ```shell script 
+    docker login
+    ```
+    This would direct you to click enter and it would open up a browser. Login to your Docker Hub account on the browser and the control would come back to CLI. You would get a success message if login was completed.
+5. Use Docker to build the sample code into a container. To build and push with
    Docker Hub, run these commands replacing `oamdev` with your Docker Hub
    username
 
 ```shell script
 # Build the container on your local machine
-docker build -t oamdev/helloworld-python:v1 .
+docker_hub_username = <your_docker_username>
+docker build -t $docker_hub_username/helloworld-python:v1 .
 
 # Push the container to docker registry
-docker push oamdev/helloworld-python:v1
+docker push $docker_hub_username/helloworld-python:v1
 ```
 
-Now we have a docker image tagged `oamdev/helloworld-python:v1`. 
+Now we have a docker image tagged `<your_docker_username/helloworld-python:v1`. 
 
 ## Determine Component Type 
 
@@ -94,19 +100,14 @@ vela traits
 
 ```console
 NAME       	NAMESPACE  	APPLIES-TO       	CONFLICTS-WITH	POD-DISRUPTIVE	DESCRIPTION
-annotations	vela-system	webservice,worker	              	false         	Add annotations for your Workload.
-cpuscaler  	vela-system	webservice,worker	              	false         	configure k8s HPA with CPU metrics for Deployment
-ingress    	vela-system	webservice,worker	              	false         	Configures K8s ingress and service to enable web traffic for
-           	           	                 	              	              	your service. Please use route trait in cap center for
-           	           	                 	              	              	advanced usage.
-labels     	vela-system	webservice,worker	              	false         	Add labels for your Workload.
-scaler     	vela-system	webservice,worker	              	false         	Configures replicas for your service by patch replicas
-           	           	                 	              	              	field.
-sidecar    	vela-system	webservice,worker	              	false         	inject a sidecar container into your app
-
+gateway                         [deployments.apps statefulsets.apps]                            Enable public web traffic for the component, the ingress API
+                                                                                                matches K8s v1.20+.                                         
+hostalias                       [deployments.apps statefulsets.apps daemonsets.apps             Add host aliases on K8s pod for your workload which follows 
+                                jobs.batch]                                                     the pod spec in path 'spec.template'.                       
+hpa                             [deployments.apps statefulsets.apps]                            Configure k8s HPA for Deployment or Statefulset
 ```
 
-Apparently, `ingress` is exactly what we need.
+Apparently, `gateway` is exactly what we need.
 
 > Again, as an end-user, you are also supposed to know how to check the traits
 > already installed on the platform and the usage of each.
@@ -190,20 +191,19 @@ vela show webservice
 
 Check the configurable points (properties) of a trait
 ```shell
-vela show ingress
+vela show gateway
 ```
 
 <details>
-<summary>click to show properties of ingress trait</summary>
+<summary>click to show properties of gateway trait</summary>
 
 ```console
 # Properties
-+--------+------------------------------------------------------------------------------+----------------+----------+---------+
-|  NAME  |                                 DESCRIPTION                                  |      TYPE      | REQUIRED | DEFAULT |
-+--------+------------------------------------------------------------------------------+----------------+----------+---------+
-| http   | Specify the mapping relationship between the http path and the workload port | map[string]int | true     |         |
-| domain | Specify the domain you want to expose                                        | string         | true     |         |
-+--------+------------------------------------------------------------------------------+----------------+----------+---------+
++---------------------+------------------------------------------------------------------------------------------------------+-------------------------------------------------+----------+------------------------+
+|        NAME         |                                             DESCRIPTION                                              |                      TYPE                       | REQUIRED |        DEFAULT         |
++---------------------+------------------------------------------------------------------------------------------------------+-------------------------------------------------+----------+------------------------+
+| domain              | Specify the domain you want to expose.                                                               | string                                          | false    |                        |
+| http                | Specify the mapping relationship between the http path and the workload port.                        | map[string]int                                  | true     |                        |
 ```
 
 </details>
@@ -222,23 +222,53 @@ spec:
     - name: helloworld
       type: webservice # <=== component type
       properties: # <=== component properties
-        image: oamdev/helloworld-python:v1
+        image: <your_docker_username>/helloworld-python:v1
         env:
           - name: "TARGET"
             value: "KubeVela"
         port: 8080
       traits:
-        - type: ingress # <=== trait type
+        - type: gateway # <=== trait type
           properties: # <=== trait properties
             domain: localhost 
             http:
               /: 8080
 ```
 
-Let's save it as file `app.yaml` and apply to deploy.
+Update the above code with your docker username and save it as file `app.yaml`. 
+Use the Vela command to apply. 
 
 ```shell script
-kubectl apply -f app.yaml
+ vela up -f app.yaml --publish-version v1.1.0
+```
+
+You will get a success message as mentioned below. 
+
+```console
+Applying an application in vela K8s object format...
+✅ App has been deployed 🚀🚀🚀
+    Port forward: vela port-forward first-app -n prod
+             SSH: vela exec first-app -n prod
+         Logging: vela logs first-app -n prod
+      App status: vela status first-app -n prod
+        Endpoint: vela status first-app -n prod --endpoint
+Application prod/first-app applied.
+```
+
+You can check the end point using the command
+
+```shell script
+vela status first-app --endpoint
+```
+The output would like the below
+
+```console
++---------+------------+--------------------------+-----------------------------+-------+
+| CLUSTER | COMPONENT  | REF(KIND/NAMESPACE/NAME) |          ENDPOINT           | INNER |
++---------+------------+--------------------------+-----------------------------+-------+
+| local   | helloworld | Ingress/prod/helloworld  | http://localhost            | false |
+| local   | helloworld | Service/prod/helloworld  | http://helloworld.prod:8080 | true  |
++---------+------------+--------------------------+-----------------------------+-------+
 ```
 
 ## Verify 
@@ -250,8 +280,8 @@ vela ls
 ```
 
 ```console
-APP             COMPONENT       TYPE            TRAITS  PHASE   HEALTHY STATUS  CREATED-TIME
-first-app       helloworld      webservice      ingress running healthy         2021-05-18 15:40:02 +0900 KST
+APP      	COMPONENT 	TYPE      	TRAITS 	PHASE  	HEALTHY	STATUS   	CREATED-TIME
+first-app	helloworld	webservice	gateway	running	healthy	Ready:1/1	2025-01-06 22:42:28 +0530 IST
 ```
 
 And call the service by cURL tool
@@ -266,7 +296,6 @@ Hello KubeVela!
 
 Yeah, we have successfully deploy an application from source now.
 
-> :warning: ingress trait replies on the ingress controller, such as nginx-ingress, installed in your cluster.
 > If you cannot access the domain, you may check the network or ingress
 > configuration of your cluster.
 
@@ -299,9 +328,13 @@ if __name__ == "__main__":
 Build and create image with a new tag.
 
 ```shell script
-docker build -t oamdev/helloworld-python:v2 .
-docker push oamdev/helloworld-python:v2
-``` 
+# Build the container on your local machine
+docker_hub_username = <your_docker_username>
+docker build -t $docker_hub_username/helloworld-python:v1 .
+
+# Push the container to docker registry
+docker push $docker_hub_username/helloworld-python:v1
+```
 
 ### Change the component properties
 
@@ -323,7 +356,7 @@ spec:
             value: "KubeVela"
         port: 8080
       traits:
-        - type: ingress
+        - type: gateway
           properties:
             domain: localhost 
             http:
@@ -332,8 +365,8 @@ spec:
 
 Apply the upgraded application
 
-```console
-kubectl apply -f app-upgrade.yaml 
+```shell script
+ vela up -f app.yaml --publish-version v1.1.1
 ```
 
 ### Verify

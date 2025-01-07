@@ -1,0 +1,7 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraMounts:
+        - hostPath: /Users/srajashekaran/Desktop/ZscalerRootCertificate-2048-SHA256.crt
+          containerPath: /etc/ssl/certs/zscaler.crt
