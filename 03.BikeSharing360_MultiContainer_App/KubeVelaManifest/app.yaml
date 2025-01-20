@@ -15,7 +15,7 @@ spec:
           - name: emailapi
             value: "http://bikesharing-email-api"
       traits:
-        - type: ingress
+        - type: gateway
           properties:
             domain: bikesharing.com
             http: 
