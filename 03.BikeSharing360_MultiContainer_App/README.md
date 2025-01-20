@@ -19,10 +19,6 @@ BikeSharing 360 for single containers can be found
 [installation](https://kubevela.io/docs/install) document to get KubeVela
 installed.
 
-* Make sure that the ingress controller has been installed (instructions
-[here](https://kubernetes.github.io/ingress-nginx/deploy)).
-
-
 ## Quickstart: Deploy the sample through KubeVela
 
 Deploy the application to Kubernetes cluster.
