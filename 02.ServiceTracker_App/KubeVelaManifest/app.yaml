@@ -17,7 +17,7 @@ spec:
           - name: QUAKES_API_ROOT
             value: "http://quakes-api.default.svc.cluster.local:3012/"
       traits:
-        - type: ingress
+        - type: gateway
           properties:
             domain: localhost
             http:
