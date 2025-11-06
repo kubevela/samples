@@ -1,0 +1,35 @@
+# AWS Credentials
+.env.aws
+
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment variables
+.env
+.env.sh
+
+# Generated files from notebooks
+crossplane/
+kubevela/
+test/
+setup/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo

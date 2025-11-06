@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-catalog-api
+  labels:
+    app: product-catalog-api
+    component: backend
+spec:
+  type: ClusterIP
+  selector:
+    app: product-catalog-api
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+    protocol: TCP
+  sessionAffinity: None
