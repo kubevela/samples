@@ -109,9 +109,6 @@ template: {
 					selector: matchLabels: {
 						"app.oam.dev/component": context.name
 					}
-					if _selectedConfig.pdb.minAvailable != _|_ {
-						minAvailable: _selectedConfig.pdb.minAvailable
-					}
 					if _selectedConfig.pdb.maxUnavailable != _|_ {
 						maxUnavailable: _selectedConfig.pdb.maxUnavailable
 					}
