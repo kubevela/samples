@@ -293,7 +293,7 @@ apply_definitions() {
 deploy_app() {
     step "Deploying $APP and the $BROWSER"
     # The topology policies don't create their namespaces, so make the stages'.
-    for ns in aws-cue aws-devkit aws-ack gcp-devkit; do
+    for ns in $STAGES; do
         kubectl create namespace "$ns" --dry-run=client -o yaml | kubectl apply -f -
     done
     vela up -f "apps/$APP.yaml"

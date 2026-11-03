@@ -105,8 +105,9 @@ def list_products():
                 product = json.loads(data.decode('utf-8'))
                 product['metadata_key'] = key
                 product_list.append(product)
-            except (StorageError, ValueError):
-                # Skip products that cannot be read or parsed
+            except ValueError:
+                # Skip products whose JSON can't be parsed. A storage failure
+                # propagates, so an outage is a 500 rather than a short list.
                 continue
 
         return jsonify({
