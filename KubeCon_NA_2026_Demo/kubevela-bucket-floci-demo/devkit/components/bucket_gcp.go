@@ -7,7 +7,7 @@ const BucketGCPType = "bucket-gcp-devkit"
 
 // BucketGCP is a Cloud Storage bucket that Crossplane's
 // provider-gcp-storage creates in floci-gcp. It takes the same parameters as
-// the S3 buckets and maps the AWS region to the nearest GCS location.
+// the S3 buckets and maps the AWS region to a comparable GCS location.
 func BucketGCP() *defkit.ComponentDefinition {
 	p := newBucketParams()
 	return defkit.NewComponent(BucketGCPType).

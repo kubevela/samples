@@ -32,8 +32,8 @@ ecosystem they already understand: modules, IDE support, linters and libraries.
 That helps with writing the component and with writing its tests.
 
 The tests are the part to show off. `cd devkit && go test ./...` runs without a
-cluster. It renders the Go component and the CUE one and checks they produce the
-same resources, and it checks every stage of `apps/product-catalog.yaml` against
+cluster. It renders the Go AWS bucket and HA trait next to their CUE twins and checks
+they produce the same resources, and it checks every stage of `apps/product-catalog.yaml` against
 its definitions. That is why moving from `aws-cue` to `aws-devkit` changes
 nothing for the developer.
 
@@ -90,8 +90,10 @@ are real; only the cloud API is emulated.
 ## Questions you'll get
 
 **What actually changes between stages?**
-Only the component type, picked by an override policy for that stage. The
-properties are passed through as written. `kubevela-bucket-floci-demo/apps/product-catalog.yaml` shows it.
+The component type and a few platform settings, set by an override policy for
+that stage: the HA trait and its level, and per-stage environment such as
+`STORAGE_PROVIDER` for GCP. The developer's bucket properties are passed
+through as written. `kubevela-bucket-floci-demo/apps/product-catalog.yaml` shows it.
 
 **Doesn't the app change when the cloud changes?**
 No. The code talks to one `ObjectStore` interface (`app/storage.py`). The
@@ -102,8 +104,9 @@ or Cloud Storage.
 They are two ways for the platform team to write the same definitions. DevKit
 is new, and it exists because many engineers are more at home in Go. They get
 the Go ecosystem (IDE, modules, linters) for the component and for its tests.
-A Go test checks the DevKit definitions against the CUE ones, so they stay
-equivalent.
+Go tests render the DevKit AWS bucket and HA trait next to their CUE twins and
+check they match. The ACK and GCP buckets have no CUE twin; they have their own
+tests.
 
 **Do I have to learn Go to write a component?**
 No. CUE still works, and both forms render the same resources. DevKit is there

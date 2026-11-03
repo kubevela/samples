@@ -169,13 +169,13 @@ spec:
           policies: ["topology-aws-cue", "override-aws-cue"]
       - name: test-aws-cue
         type: request
+        timeout: 10s
         properties:
           method: POST
           url: http://product-catalog-api.aws-cue.svc.cluster.local:8080/products
           body:
             name: promotion-check
             price: 1
-          timeout: 10s
 
       - name: approve-aws-devkit
         type: suspend
@@ -185,13 +185,13 @@ spec:
           policies: ["topology-aws-devkit", "override-aws-devkit"]
       - name: test-aws-devkit
         type: request
+        timeout: 10s
         properties:
           method: POST
           url: http://product-catalog-api.aws-devkit.svc.cluster.local:8080/products
           body:
             name: promotion-check
             price: 1
-          timeout: 10s
 
       - name: approve-aws-ack
         type: suspend
@@ -201,13 +201,13 @@ spec:
           policies: ["topology-aws-ack", "override-aws-ack"]
       - name: test-aws-ack
         type: request
+        timeout: 10s
         properties:
           method: POST
           url: http://product-catalog-api.aws-ack.svc.cluster.local:8080/products
           body:
             name: promotion-check
             price: 1
-          timeout: 10s
 
       - name: approve-gcp-devkit
         type: suspend
@@ -217,10 +217,10 @@ spec:
           policies: ["topology-gcp-devkit", "override-gcp-devkit"]
       - name: test-gcp-devkit
         type: request
+        timeout: 10s
         properties:
           method: POST
           url: http://product-catalog-api.gcp-devkit.svc.cluster.local:8080/products
           body:
             name: promotion-check
             price: 1
-          timeout: 10s

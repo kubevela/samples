@@ -59,7 +59,7 @@ var postures = map[string]posture{
 	LevelDev: {minReplicas: 1, maxReplicas: 2},
 	LevelStaging: {
 		minReplicas: 1, maxReplicas: 3,
-		budget:       &disruptionBudget{"minAvailable", "50%"},
+		budget:       &disruptionBudget{"maxUnavailable", 1},
 		antiAffinity: antiAffinityPreferred,
 	},
 	LevelProd: {
@@ -99,7 +99,7 @@ func HighAvailability() *defkit.TraitDefinition {
 	return defkit.NewTrait(HighAvailabilityType).
 		Description("Auto-inject HA best practices (HPA, PDB, topology spread, anti-affinity) by environment level. The HPA scales on CPU, so the workload needs a CPU request.").
 		AppliesTo("deployments.apps", "statefulsets.apps").
-		PodDisruptive(false).
+		PodDisruptive(true).
 		Params(level).
 		Template(func(tpl *defkit.Template) {
 			for _, name := range levels {

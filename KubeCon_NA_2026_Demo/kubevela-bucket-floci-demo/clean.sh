@@ -10,6 +10,11 @@ set -euo pipefail
 
 CLUSTER_NAME="${CLUSTER_NAME:-kubevela-bucket-floci-demo}"
 
+case "${1:-}" in
+    "" | --apps-only) ;;
+    *) echo "Usage: ./clean.sh [--apps-only]" >&2; exit 2 ;;
+esac
+
 if [ "${1:-}" = "--apps-only" ]; then
     # ACK only deletes empty buckets, and the workflow left a product in the
     # aws-ack one, so empty it with the API's own storage code first.
@@ -18,7 +23,10 @@ if [ "${1:-}" = "--apps-only" ]; then
             'import os, storage; s = storage.S3ObjectStore(os.environ["BUCKET_NAME"]); [s.delete(k) for k in s.list_keys("")]' ||
             echo "⚠ Couldn't empty product-images-aws-ack; its ACK Bucket will wait until the bucket is empty"
     fi
-    vela delete product-catalog -n default -y || true
+    # An application that is already gone is fine; a failed delete is not.
+    if kubectl get application product-catalog -n default >/dev/null 2>&1; then
+        vela delete product-catalog -n default -y
+    fi
     exit 0
 fi
 

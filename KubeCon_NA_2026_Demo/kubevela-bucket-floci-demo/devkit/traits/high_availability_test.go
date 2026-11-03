@@ -83,7 +83,7 @@ func TestHighAvailabilityDefaultsToDev(t *testing.T) {
 	if _, ok := out.Outputs["pdb"]; ok {
 		t.Error("dev got a PodDisruptionBudget")
 	}
-	if podSpec := cuetest.Get(out.Patch, "spec.template.spec"); len(podSpec.(map[string]any)) != 0 {
+	if podSpec, _ := cuetest.Get(out.Patch, "spec.template.spec").(map[string]any); len(podSpec) != 0 {
 		t.Errorf("dev patched the pod spec: %#v", podSpec)
 	}
 }
@@ -93,7 +93,7 @@ func TestHighAvailabilityDisruptionBudget(t *testing.T) {
 		level, field string
 		want         any
 	}{
-		{LevelStaging, "minAvailable", "50%"},
+		{LevelStaging, "maxUnavailable", int64(1)},
 		{LevelProd, "maxUnavailable", int64(2)},
 		{LevelProdLocal, "maxUnavailable", int64(1)},
 	}

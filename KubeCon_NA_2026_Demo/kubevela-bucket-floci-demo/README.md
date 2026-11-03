@@ -11,9 +11,9 @@ One Application, `product-catalog`, promoted through four stages. Each stage get
 
 Crossplane creates its buckets through provider-aws-s3 or provider-gcp-storage, as cluster-wide managed resources. ACK's S3 controller creates its bucket from a `Bucket` in the stage's namespace. The app is the product-catalog API from kubevela-one-interface-demos, which stores products in whichever bucket it is given.
 
-The Application's workflow deploys a stage, then creates a product through that stage's API. That fails the workflow unless the API can write to its bucket. Before each later stage it waits for approval. The HA trait's level goes up along the way: `dev` (1-2 replicas) in `aws-cue`, `staging` (1-3, a disruption budget, spread across nodes) in `aws-devkit` and `aws-ack`, `prod-local` (3-6) in `gcp-devkit`.
+The Application's workflow deploys a stage, then creates a product through that stage's API. That fails the workflow unless the API can write to its bucket. Before each later stage it waits for approval. The HA trait's level goes up along the way: `dev` (1-2 replicas) in `aws-cue`, `staging` (1-3, a disruption budget, preferred anti-affinity) in `aws-devkit` and `aws-ack`, `prod-local` (3-6) in `gcp-devkit`.
 
-The Application is defined once, in `apps/product-catalog.yaml`. Each stage's override policy picks its bucket component and its HA trait, so the DevKit stages differ from `aws-cue` only in those types. `cd devkit && go test ./...` checks that the DevKit definitions render the same resources as the CUE ones, and that each stage's definitions accept its properties.
+The Application is defined once, in `apps/product-catalog.yaml`. Each stage's override policy picks its bucket component and its HA trait, so the DevKit stages differ from `aws-cue` only in those types, plus per-stage platform settings such as the bucket name and, for `gcp-devkit`, the storage provider. The developer's bucket properties are the same everywhere. `cd devkit && go test ./...` checks that the DevKit definitions render the same resources as the CUE ones, and that each stage's definitions accept its properties.
 
 ## Run it
 
@@ -28,9 +28,9 @@ It creates the k3d cluster `kubevela-bucket-floci-demo` (1 server, 2 agents), bu
 - VelaUX on http://localhost:8000 (user `admin`, password `VelaUX12345` or `VELAUX_ADMIN_PASSWORD`)
 - the bucket browser on http://localhost:8081, which shows every stage's bucket on one page (see below)
 
-`demo.sh --open` opens both pages for you on macOS. The forwards keep running after `demo.sh` ends; `./clean.sh` stops them. Set `VELAUX_LOCAL_PORT` or `BROWSER_LOCAL_PORT` if a port is taken.
+`./demo.sh --open` opens both pages for you on macOS. The forwards keep running after `demo.sh` ends; `./clean.sh` stops them. Set `VELAUX_LOCAL_PORT` or `BROWSER_LOCAL_PORT` if a port is taken.
 
-Needs `docker`, `k3d`, `kubectl`, `helm`, Go 1.27+ (for the DevKit module) and the vela CLI v1.12.0-alpha.1:
+Needs `docker`, `k3d`, `kubectl`, `helm`, Go 1.27.1+ (for the DevKit module) and the vela CLI v1.12.0-alpha.1:
 
 ```bash
 curl -fsSl https://kubevela.io/script/install.sh | bash -s v1.12.0-alpha.1
@@ -97,7 +97,7 @@ Crossplane's GCP ProviderConfig has no endpoint field. The provider runs the Ter
 ## Changes from kubevela-one-interface-demos
 
 - `app/storage.py` addresses S3 buckets by path when `AWS_ENDPOINT_URL` is set, since Floci doesn't serve `<bucket>.<host>` virtual hosts. Against floci-gcp the GCS client needs nothing: `STORAGE_EMULATOR_HOST` makes it use anonymous credentials.
-- The Crossplane bucket components create managed resources directly rather than through a composition. All the bucket components and take the same parameters as there (`name`, `region`, `projectName`; versioning is left out). `region` is limited to the regions `bucket-gcp-devkit` can map to a GCS location.
+- The Crossplane bucket components create managed resources directly rather than through a composition. All the bucket components take the same parameters as there (`name`, `region`, `projectName`; versioning is left out). `region` is limited to the regions `bucket-gcp-devkit` can map to a GCS location.
 - One Application promotes across backings, where the original deploys one backing per run.
 - The API base64-decodes `image_data` and takes its type from `image_content_type` (JPEG by default), so a stored picture is a real image file. The image key's extension follows the type, and without a picture the placeholder is `image.json`.
 - The bucket browser is adapted from `apps/bucket-browser`, which browses one bucket and shows only text: this one shows every stage at once, renders pictures, and serves objects with a Content-Security-Policy so an uploaded SVG can't run scripts.

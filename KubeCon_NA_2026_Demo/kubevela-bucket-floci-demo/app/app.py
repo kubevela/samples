@@ -18,6 +18,8 @@ from flask import Flask, request, jsonify
 from storage import build_object_store, StorageError
 
 app = Flask(__name__)
+# Pictures arrive base64 in the JSON body; refuse anything larger than this.
+app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
 
 # The object store — S3 or GCS, chosen by STORAGE_PROVIDER. Construction is cheap
 # and credential-free; the cloud client is opened lazily on first use.
@@ -103,8 +105,8 @@ def list_products():
                 product = json.loads(data.decode('utf-8'))
                 product['metadata_key'] = key
                 product_list.append(product)
-            except StorageError:
-                # Skip products that cannot be read
+            except (StorageError, ValueError):
+                # Skip products that cannot be read or parsed
                 continue
 
         return jsonify({
@@ -119,9 +121,9 @@ def list_products():
 def create_product():
     """Create a new product with optional image upload to object storage"""
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True)
 
-        if not data or 'name' not in data:
+        if not isinstance(data, dict) or 'name' not in data:
             return jsonify({'error': 'Product name is required'}), 400
 
         product_id = str(uuid.uuid4())
@@ -142,7 +144,7 @@ def create_product():
             if content_type not in IMAGE_TYPES:
                 return jsonify({'error': f'image_content_type must be one of {sorted(IMAGE_TYPES)}'}), 400
             try:
-                image_body = base64.b64decode(data['image_data'], validate=True)
+                image_body = base64.b64decode(str(data['image_data']), validate=True)
             except (binascii.Error, ValueError):
                 return jsonify({'error': 'image_data must be base64'}), 400
             image_key = build_image_key(product_id, IMAGE_TYPES[content_type])
@@ -176,9 +178,7 @@ def create_product():
         except StorageError as e:
             return jsonify({'error': f'Failed to store product metadata: {str(e)}'}), 500
 
-        stored_product = fetch_product(product_id)
-
-        return jsonify(stored_product or product), 201
+        return jsonify(product), 201
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500

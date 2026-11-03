@@ -1,7 +1,7 @@
 // An S3 bucket, created by Crossplane's provider-aws-s3 in Floci.
 //
-// One of three bucket components that take the same parameters (name,
-// region, projectName). The others, bucket-aws-devkit and
+// One of four bucket components that take the same parameters (name,
+// region, projectName). The others, bucket-aws-devkit, bucket-aws-ack and
 // bucket-gcp-devkit, are written in Go with DevKit in
 // ../../devkit/components/. An Application changes backing by changing only
 // the component type.

@@ -1,7 +1,7 @@
 # Floci: a free, MIT-licensed local AWS emulator (https://github.com/floci-io/floci).
 # It replaces LocalStack here because LocalStack releases after 4.14.0 refuse
 # to start without an auth token. Crossplane reaches it at
-# http://floci.floci-system.svc.cluster.local:4566 (see providerconfig.yaml).
+# http://floci.floci-system.svc.cluster.local:4566 (see providerconfigs.yaml).
 apiVersion: v1
 kind: Namespace
 metadata:

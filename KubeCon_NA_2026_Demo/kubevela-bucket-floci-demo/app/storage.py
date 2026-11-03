@@ -98,7 +98,7 @@ class S3ObjectStore(ObjectStore):
         return self._client
 
     def get(self, key):
-        from botocore.exceptions import ClientError
+        from botocore.exceptions import BotoCoreError, ClientError
         try:
             response = self.client.get_object(Bucket=self.bucket, Key=key)
             return response["Body"].read()
@@ -107,25 +107,27 @@ class S3ObjectStore(ObjectStore):
             if code in ("NoSuchKey", "NoSuchBucket", "404"):
                 return None
             raise StorageError(str(e)) from e
+        except BotoCoreError as e:
+            raise StorageError(str(e)) from e
 
     def put(self, key, data, content_type):
-        from botocore.exceptions import ClientError
+        from botocore.exceptions import BotoCoreError, ClientError
         try:
             self.client.put_object(
                 Bucket=self.bucket, Key=key, Body=data, ContentType=content_type
             )
-        except ClientError as e:
+        except (ClientError, BotoCoreError) as e:
             raise StorageError(str(e)) from e
 
     def delete(self, key):
-        from botocore.exceptions import ClientError
+        from botocore.exceptions import BotoCoreError, ClientError
         try:
             self.client.delete_object(Bucket=self.bucket, Key=key)
-        except ClientError as e:
+        except (ClientError, BotoCoreError) as e:
             raise StorageError(str(e)) from e
 
     def list_keys(self, prefix):
-        from botocore.exceptions import ClientError
+        from botocore.exceptions import BotoCoreError, ClientError
         keys = []
         continuation_token = None
         try:
@@ -139,27 +141,27 @@ class S3ObjectStore(ObjectStore):
                 continuation_token = response.get("NextContinuationToken")
                 if not continuation_token:
                     break
-        except ClientError as e:
+        except (ClientError, BotoCoreError) as e:
             raise StorageError(str(e)) from e
         return keys
 
     def bucket_exists(self):
-        from botocore.exceptions import ClientError, NoCredentialsError
+        from botocore.exceptions import BotoCoreError, ClientError
         try:
             self.client.head_bucket(Bucket=self.bucket)
             return True
-        except (ClientError, NoCredentialsError):
+        except (ClientError, BotoCoreError):
             return False
 
     def signed_url(self, key, expires_seconds):
-        from botocore.exceptions import ClientError
+        from botocore.exceptions import BotoCoreError, ClientError
         try:
             return self.client.generate_presigned_url(
                 "get_object",
                 Params={"Bucket": self.bucket, "Key": key},
                 ExpiresIn=expires_seconds,
             )
-        except ClientError as e:
+        except (ClientError, BotoCoreError) as e:
             raise StorageError(str(e)) from e
 
 

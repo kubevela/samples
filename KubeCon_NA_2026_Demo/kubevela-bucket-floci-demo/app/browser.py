@@ -73,6 +73,8 @@ def short_time(iso):
 
 STAGES = parse_buckets(os.environ.get('BUCKETS', ''))
 BY_NAME = {s['stage']: s for s in STAGES}
+if len(BY_NAME) != len(STAGES):
+    raise ValueError('BUCKETS lists a stage name twice')
 
 
 def stage_view(stage):

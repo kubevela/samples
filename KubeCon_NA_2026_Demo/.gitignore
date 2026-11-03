@@ -1,6 +1,7 @@
 # Environment and credentials
 .env
 .env.*
+!.env.example
 .aws-creds
 .mcp.json
 

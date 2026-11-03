@@ -38,10 +38,16 @@ func Diff(params []defkit.Param, props any) []string {
 func jsonFields(t reflect.Type) map[string]bool {
 	fields := map[string]bool{}
 	for i := 0; i < t.NumField(); i++ {
-		tag := t.Field(i).Tag.Get("json")
-		name, opts, _ := strings.Cut(tag, ",")
-		if name == "" || name == "-" {
+		field := t.Field(i)
+		if !field.IsExported() {
 			continue
+		}
+		name, opts, _ := strings.Cut(field.Tag.Get("json"), ",")
+		if name == "-" && opts == "" {
+			continue
+		}
+		if name == "" {
+			name = field.Name
 		}
 		fields[name] = strings.Contains(opts, "omitempty")
 	}

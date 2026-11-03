@@ -42,6 +42,7 @@ else:
         print(f"Created {json.load(resp)['name']}")
 PY
 
+failed=0
 for stage in $STAGES; do
     entry="$(stage_logo "$stage")"
     read -r file logo <<<"$entry"
@@ -59,5 +60,6 @@ for stage in $STAGES; do
     printf 'NAME = "Mug %s (%s)"\nIMAGE_B64 = "%s"\nIMAGE_TYPE = "%s"\n%s\n' \
         "$logo" "$stage" "$(base64 <"$picture" | tr -d '\n')" "$type" "$SEED" |
         kubectl -n "$stage" exec -i deploy/product-catalog-api -- python - ||
-        echo "✗ Couldn't seed $stage"
+        { echo "✗ Couldn't seed $stage"; failed=1; }
 done
+exit "$failed"

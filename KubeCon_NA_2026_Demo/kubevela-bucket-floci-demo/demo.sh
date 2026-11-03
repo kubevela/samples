@@ -87,7 +87,8 @@ check_tools() {
         exit 1
     fi
     local cli
-    cli="v$(vela version 2>/dev/null | awk '/CLI Version/{print $3}')"
+    cli="$(vela version 2>/dev/null | awk '/CLI Version/{print $3}')"
+    cli="v${cli#v}" # the CLI may or may not print the v
     if [ "$cli" != "$VELA_VERSION" ]; then
         echo "⚠ vela CLI is $cli, the demo pins $VELA_VERSION:"
         echo "  curl -fsSl https://kubevela.io/script/install.sh | bash -s $VELA_VERSION"
@@ -188,9 +189,12 @@ install_velaux() {
         return
     fi
     # PUT with a JSON body, which kubectl --raw can't send, so use a curl pod.
+    # Escape the password for JSON: backslashes first, then quotes.
+    local password="${VELAUX_ADMIN_PASSWORD//\\/\\\\}"
+    password="${password//\"/\\\"}"
     kubectl run velaux-init-admin --rm -i --restart=Never --quiet --image="$CURL_IMAGE" -- \
         curl -sS --fail-with-body -X PUT -H 'Content-Type: application/json' \
-        -d "{\"name\":\"admin\",\"password\":\"$VELAUX_ADMIN_PASSWORD\",\"email\":\"admin@example.com\"}" \
+        -d "{\"name\":\"admin\",\"password\":\"$password\",\"email\":\"admin@example.com\"}" \
         "$VELAUX_URL/auth/init_admin"
     echo ""
     echo "✓ VelaUX admin created"
@@ -288,13 +292,17 @@ apply_definitions() {
 
 deploy_app() {
     step "Deploying $APP and the $BROWSER"
+    # The topology policies don't create their namespaces, so make the stages'.
+    for ns in aws-cue aws-devkit aws-ack gcp-devkit; do
+        kubectl create namespace "$ns" --dry-run=client -o yaml | kubectl apply -f -
+    done
     vela up -f "apps/$APP.yaml"
     vela up -f "apps/$BROWSER.yaml"
 }
 
 # Prints a workflow step's phase, or nothing before the step starts.
 step_phase() {
-    kubectl get "application/$APP" -o jsonpath="{.status.workflow.steps[?(@.name==\"$1\")].phase}"
+    kubectl get -n default "application/$APP" -o jsonpath="{.status.workflow.steps[?(@.name==\"$1\")].phase}"
 }
 
 # Waits for a workflow step to reach one of the phases in $2, failing if it
@@ -363,8 +371,8 @@ forward_velaux() {
 # The browser's Application was applied with the product-catalog one; by the
 # time the first stage is deployed it is usually running.
 forward_browser() {
-    kubectl wait --for=jsonpath='{.status.status}'=running "application/$BROWSER" --timeout=300s
-    kubectl rollout status "deploy/$BROWSER" --timeout=300s
+    kubectl wait -n default --for=jsonpath='{.status.status}'=running "application/$BROWSER" --timeout=300s
+    kubectl rollout status -n default "deploy/$BROWSER" --timeout=300s
     forward "$BROWSER" default "$BROWSER" "$BROWSER_LOCAL_PORT" 8080 "http://localhost:$BROWSER_LOCAL_PORT"
 }
 

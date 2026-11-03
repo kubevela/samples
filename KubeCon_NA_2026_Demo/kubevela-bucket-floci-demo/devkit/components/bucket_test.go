@@ -60,12 +60,16 @@ func TestBucketAWSRendersBucket(t *testing.T) {
 // The ACK bucket is namespaced and named like the Crossplane ones, with its
 // region as an annotation since the controller has one default region.
 func TestBucketACKRendersBucket(t *testing.T) {
-	out := render(t, BucketACK(), BucketProperties{Name: "product-images", Region: "eu-west-1"})
+	out, err := cuetest.Render(BucketACK(), map[string]any{"name": "product-images", "namespace": "aws-ack"},
+		BucketProperties{Name: "product-images", Region: "eu-west-1"})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	for path, want := range map[string]any{
 		"apiVersion":           "s3.services.k8s.aws/v1alpha1",
-		"metadata.name":        "product-images-aws-devkit",
-		"spec.name":            "product-images-aws-devkit",
+		"metadata.name":        "product-images-aws-ack",
+		"spec.name":            "product-images-aws-ack",
 		"metadata.labels":      map[string]any{"app.kubernetes.io/part-of": "kubecon-na-2026"},
 		"metadata.annotations": map[string]any{"services.k8s.aws/region": "eu-west-1"},
 	} {
@@ -81,6 +85,9 @@ func TestBucketACKRendersBucket(t *testing.T) {
 func TestBucketGCPMapsRegionToLocation(t *testing.T) {
 	for _, region := range Regions {
 		out := render(t, BucketGCP(), BucketProperties{Name: "product-images", Region: region})
+		if gcsLocations[region] == "" {
+			t.Errorf("%s has no GCS location", region)
+		}
 		if got := cuetest.Get(out.Output, "spec.forProvider.location"); got != gcsLocations[region] {
 			t.Errorf("%s: location = %v, want %s", region, got, gcsLocations[region])
 		}
