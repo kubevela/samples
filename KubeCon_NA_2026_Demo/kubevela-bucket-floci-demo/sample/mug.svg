@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <title>KubeCon NA 2026 mug</title>
+  <rect width="120" height="120" rx="16" fill="#e8f0fb"/>
+  <!-- steam -->
+  <path d="M44 22c-4 6 4 10 0 16M58 18c-4 6 4 10 0 16M72 22c-4 6 4 10 0 16"
+        fill="none" stroke="#9fb3c8" stroke-width="3" stroke-linecap="round"/>
+  <!-- handle -->
+  <path d="M84 52h6a12 12 0 0 1 0 24h-6" fill="none" stroke="#326ce5" stroke-width="7"/>
+  <!-- cup -->
+  <path d="M28 44h58v34a14 14 0 0 1-14 14H42a14 14 0 0 1-14-14z" fill="#326ce5"/>
+  <!-- a seven-spoke wheel, as on the Kubernetes logo -->
+  <g transform="translate(57 66)" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round">
+    <circle r="11"/>
+    <path d="M0 0V-11M0 0L8.6 -6.9M0 0L10.7 2.4M0 0L4.8 9.9M0 0L-4.8 9.9M0 0L-10.7 2.4M0 0L-8.6 -6.9"/>
+  </g>
+  <rect x="22" y="94" width="76" height="6" rx="3" fill="#9fb3c8"/>
+  <text x="60" y="113" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1d2430">KubeCon NA 2026</text>
+</svg>

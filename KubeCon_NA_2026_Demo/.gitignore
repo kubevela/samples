@@ -1,0 +1,25 @@
+# Environment and credentials
+.env
+.env.*
+.aws-creds
+.mcp.json
+
+# Kubeconfig files (contain private keys)
+kubeconfig*
+.kubeconfig
+
+# `vela up -f -` saves the Application it read from stdin here
+vela.yaml
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo

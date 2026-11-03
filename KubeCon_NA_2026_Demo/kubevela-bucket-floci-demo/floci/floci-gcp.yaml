@@ -1,0 +1,61 @@
+# floci-gcp: Floci's local GCP emulator (https://github.com/floci-io/floci-gcp).
+# Crossplane's GCP provider and the app reach its Cloud Storage API at
+# http://floci-gcp.floci-system.svc.cluster.local:4588 (see providerconfigs.yaml).
+# Goes after floci.yaml, which creates the namespace.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: floci-gcp
+  namespace: floci-system
+  labels:
+    app.kubernetes.io/name: floci-gcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: floci-gcp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: floci-gcp
+    spec:
+      # Service links would inject FLOCI_GCP_PORT=tcp://..., which floci-gcp
+      # reads as its own port setting and fails to start.
+      enableServiceLinks: false
+      containers:
+        - name: floci-gcp
+          image: floci/floci-gcp:0.11.0
+          ports:
+            - name: api
+              containerPort: 4588
+          env:
+            # The URLs floci-gcp puts in its responses, such as a bucket's selfLink.
+            - name: FLOCI_GCP_HOSTNAME
+              value: floci-gcp.floci-system.svc.cluster.local
+            - name: FLOCI_GCP_BASE_URL
+              value: http://floci-gcp.floci-system.svc.cluster.local:4588
+          readinessProbe:
+            tcpSocket:
+              port: api
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: floci-gcp
+  namespace: floci-system
+  labels:
+    app.kubernetes.io/name: floci-gcp
+spec:
+  selector:
+    app.kubernetes.io/name: floci-gcp
+  ports:
+    - name: api
+      port: 4588
+      targetPort: api

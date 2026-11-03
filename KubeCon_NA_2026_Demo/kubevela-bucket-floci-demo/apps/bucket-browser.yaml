@@ -1,0 +1,57 @@
+# The bucket browser: one page showing every stage's product-catalog bucket,
+# its products with their pictures, and its objects. demo.sh forwards it to
+# http://localhost:8081.
+#
+# It runs from the product-catalog image (../app/browser.py) and reads both
+# Floci (S3) and floci-gcp (Cloud Storage). It sits outside the promotion:
+# a bucket shows as "not created yet" until its stage is deployed.
+#
+# cd ../devkit && go test ./... checks BUCKETS against product-catalog.yaml's
+# stages.
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: bucket-browser
+  namespace: default
+spec:
+  components:
+    - name: bucket-browser
+      type: webservice
+      properties:
+        image: product-catalog:latest
+        imagePullPolicy: IfNotPresent
+        cmd: ["python", "browser.py"]
+        ports:
+          - port: 8080
+            expose: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+      traits:
+        - type: env
+          properties:
+            env:
+              PORT: "8080"
+              # One entry per stage: stage|provider|bucket|label. The
+              # card shows the label as its heading; *word* in a label shows in
+              # red, marking what changed from the stage before.
+              BUCKETS: >-
+                aws-cue|aws|product-images-aws-cue|AWS S3 via Crossplane, CUE;
+                aws-devkit|aws|product-images-aws-devkit|AWS S3 via Crossplane, *DevKit*;
+                aws-ack|aws|product-images-aws-ack|AWS S3 via *ACK*, DevKit;
+                gcp-devkit|gcp|product-images-gcp-devkit|*GCP GCS* via *Crossplane*, DevKit
+              AWS_REGION: us-west-2
+              AWS_ENDPOINT_URL: http://floci.floci-system.svc.cluster.local:4566
+              AWS_ACCESS_KEY_ID: test
+              AWS_SECRET_ACCESS_KEY: test
+              STORAGE_EMULATOR_HOST: http://floci-gcp.floci-system.svc.cluster.local:4588
+              GOOGLE_CLOUD_PROJECT: floci-local

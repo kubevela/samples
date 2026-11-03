@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <title>KubeCon NA 2026 mug: KubeVela</title>
+  <!-- The logo is KubeVela's official artwork, unmodified; see LOGOS.md. -->
+  <rect width="120" height="120" rx="16" fill="#e8f0fb"/>
+  <path d="M42 22c-4 6 4 10 0 16M56 18c-4 6 4 10 0 16M70 22c-4 6 4 10 0 16"
+        fill="none" stroke="#9fb3c8" stroke-width="3" stroke-linecap="round"/>
+  <path d="M92 52h5a12 12 0 0 1 0 24h-5" fill="none" stroke="#006fff" stroke-width="7"/>
+  <path d="M18 44h74v34a14 14 0 0 1-14 14H32a14 14 0 0 1-14-14z" fill="#fff" stroke="#006fff" stroke-width="2"/>
+  <image x="36" y="47" width="38" height="40" preserveAspectRatio="xMidYMid meet"
+         href="data:image/svg+xml;base64,PHN2ZyBpZD0i5Zu+5bGCXzEiIGRhdGEtbmFtZT0i5Zu+5bGCIDEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDEyMi41IDEyMi41Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzAwNmZmZjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPkt1YmVWZWxhIDwvdGl0bGU+PHBhdGggZD0iTTMyLjA1LDk2LjI0YTExLjU4LDExLjU4LDAsMCwwLDEwLDUuNzksMTEuMzQsMTEuMzQsMCwwLDAsNS42Mi0xLjQ3LDYsNiwwLDAsMSw1Ljg5LDBBMTEuMzMsMTEuMzMsMCwwLDAsNTkuMTksMTAyYTExLjUyLDExLjUyLDAsMCwwLDUuMjctMS4yNyw2LjE3LDYuMTcsMCwwLDEsNS43LDAsMTEuNTUsMTEuNTUsMCwwLDAsMTUuMjgtNC41MloiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik05MS41Miw3Ni4yNyw5MS4zOCw3NEM5MCw1MS43OSw4MS43LDMwLjkxLDY4LjA3LDE1LjIzaDB2NjBaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNjQuODYsNzUuMDVWMjcuOEE3OS4yNiw3OS4yNiwwLDAsMCw0Miw3NFoiLz48cGF0aCBkPSJNNDMuODcsNzguMzgsNDIsNzQsMjAuMzUsNzNsNiwxNC4xMmgwYTEwLjE2LDEwLjE2LDAsMCwwLDguNzksNS4wOEExMCwxMCwwLDAsMCw0MCw5MWE3LjMyLDcuMzIsMCwwLDEsNy4xNywwLDEwLDEwLDAsMCwwLDkuNzgsMCw3LjMsNy4zLDAsMCwxLDcuMTcsMCwxMCwxMCwwLDAsMCw5Ljc4LDAsNy4zMiw3LjMyLDAsMCwxLDcuMTcsMEExMCwxMCwwLDAsMCw4Niw5Mi4yM2ExMC4xNiwxMC4xNiwwLDAsMCw4Ljc5LTUuMDhsMi40Ni01TDQ2LDc5Ljg0QTIuMzgsMi4zOCwwLDAsMSw0My44Nyw3OC4zOFoiLz48L3N2Zz4="/>
+  <rect x="14" y="96" width="88" height="5" rx="2.5" fill="#9fb3c8"/>
+  <text x="58" y="113" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#1d2430">KubeCon NA 2026</text>
+</svg>

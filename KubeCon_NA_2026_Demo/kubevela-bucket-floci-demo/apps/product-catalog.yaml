@@ -1,0 +1,226 @@
+# One Application, promoted through four stages. Each stage is a namespace
+# with a different bucket backing; only the definition types change, one
+# thing at a time:
+#
+#   aws-cue     bucket-aws-cue     + high-availability         S3 via Crossplane, CUE
+#   aws-devkit  bucket-aws-devkit  + high-availability-devkit  S3 via Crossplane, DevKit (Go)
+#   aws-ack     bucket-aws-ack     + high-availability-devkit  S3 via ACK, DevKit
+#   gcp-devkit  bucket-gcp-devkit  + high-availability-devkit  Cloud Storage via Crossplane, DevKit
+#
+# S3 is Floci and Cloud Storage is floci-gcp.
+# The CUE definitions are in ../definitions/, the DevKit ones in ../devkit/.
+# The workflow deploys a stage, creates a product through the API to prove
+# the app can write to its bucket, then waits for approval before the next.
+# Resume with: vela workflow resume product-catalog
+#
+# cd ../devkit && go test ./... checks the properties below against the
+# definitions.
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: product-catalog
+  namespace: default
+spec:
+  components:
+    - name: product-images
+      type: bucket-aws-cue
+      # Anchored so the overrides below can reuse it.
+      properties: &bucket-properties
+        name: product-images
+        region: us-west-2
+        projectName: kubecon-na-2026
+
+    - name: product-catalog-api
+      type: webservice
+      properties:
+        image: product-catalog:latest
+        imagePullPolicy: IfNotPresent
+        # Sets the CPU request and limit. The high-availability HPA scales on
+        # CPU utilization, which needs a request.
+        cpu: "250m"
+        ports:
+          - port: 8080
+            expose: true
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        # Ready only once the API can see its bucket.
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      traits:
+        # A map, so each stage's override adds keys instead of replacing a list.
+        - type: env
+          properties:
+            env:
+              PORT: "8080"
+              STORAGE_PROVIDER: aws
+              AWS_REGION: us-west-2
+              AWS_ENDPOINT_URL: http://floci.floci-system.svc.cluster.local:4566
+              AWS_ACCESS_KEY_ID: test
+              AWS_SECRET_ACCESS_KEY: test
+        # Each stage adds its own HA trait, CUE or DevKit, in its override.
+
+  policies:
+    - name: topology-aws-cue
+      type: topology
+      properties:
+        clusters: ["local"]
+        namespace: aws-cue
+    - name: topology-aws-devkit
+      type: topology
+      properties:
+        clusters: ["local"]
+        namespace: aws-devkit
+    - name: topology-aws-ack
+      type: topology
+      properties:
+        clusters: ["local"]
+        namespace: aws-ack
+    - name: topology-gcp-devkit
+      type: topology
+      properties:
+        clusters: ["local"]
+        namespace: gcp-devkit
+
+    # The bucket components append the namespace to the bucket name, so each
+    # stage tells the API its bucket, and picks its HA trait and level.
+    - name: override-aws-cue
+      type: override
+      properties:
+        components:
+          - name: product-catalog-api
+            traits:
+              - type: env
+                properties:
+                  env:
+                    BUCKET_NAME: product-images-aws-cue
+              - type: high-availability
+                properties:
+                  level: dev
+
+    # A different type replaces the whole component, so each override passes
+    # the bucket properties again, through the YAML anchor above.
+    - name: override-aws-devkit
+      type: override
+      properties:
+        components:
+          - name: product-images
+            type: bucket-aws-devkit
+            properties: *bucket-properties
+          - name: product-catalog-api
+            traits:
+              - type: env
+                properties:
+                  env:
+                    BUCKET_NAME: product-images-aws-devkit
+              - type: high-availability-devkit
+                properties:
+                  level: staging
+
+    - name: override-aws-ack
+      type: override
+      properties:
+        components:
+          - name: product-images
+            type: bucket-aws-ack
+            properties: *bucket-properties
+          - name: product-catalog-api
+            traits:
+              - type: env
+                properties:
+                  env:
+                    BUCKET_NAME: product-images-aws-ack
+              - type: high-availability-devkit
+                properties:
+                  level: staging
+
+    - name: override-gcp-devkit
+      type: override
+      properties:
+        components:
+          - name: product-images
+            type: bucket-gcp-devkit
+            properties: *bucket-properties
+          - name: product-catalog-api
+            traits:
+              - type: env
+                properties:
+                  env:
+                    BUCKET_NAME: product-images-gcp-devkit
+                    STORAGE_PROVIDER: gcp
+                    STORAGE_EMULATOR_HOST: http://floci-gcp.floci-system.svc.cluster.local:4588
+                    GOOGLE_CLOUD_PROJECT: floci-local
+              - type: high-availability-devkit
+                properties:
+                  level: prod-local
+
+  workflow:
+    steps:
+      - name: deploy-aws-cue
+        type: deploy
+        properties:
+          policies: ["topology-aws-cue", "override-aws-cue"]
+      - name: test-aws-cue
+        type: request
+        properties:
+          method: POST
+          url: http://product-catalog-api.aws-cue.svc.cluster.local:8080/products
+          body:
+            name: promotion-check
+            price: 1
+          timeout: 10s
+
+      - name: approve-aws-devkit
+        type: suspend
+      - name: deploy-aws-devkit
+        type: deploy
+        properties:
+          policies: ["topology-aws-devkit", "override-aws-devkit"]
+      - name: test-aws-devkit
+        type: request
+        properties:
+          method: POST
+          url: http://product-catalog-api.aws-devkit.svc.cluster.local:8080/products
+          body:
+            name: promotion-check
+            price: 1
+          timeout: 10s
+
+      - name: approve-aws-ack
+        type: suspend
+      - name: deploy-aws-ack
+        type: deploy
+        properties:
+          policies: ["topology-aws-ack", "override-aws-ack"]
+      - name: test-aws-ack
+        type: request
+        properties:
+          method: POST
+          url: http://product-catalog-api.aws-ack.svc.cluster.local:8080/products
+          body:
+            name: promotion-check
+            price: 1
+          timeout: 10s
+
+      - name: approve-gcp-devkit
+        type: suspend
+      - name: deploy-gcp-devkit
+        type: deploy
+        properties:
+          policies: ["topology-gcp-devkit", "override-gcp-devkit"]
+      - name: test-gcp-devkit
+        type: request
+        properties:
+          method: POST
+          url: http://product-catalog-api.gcp-devkit.svc.cluster.local:8080/products
+          body:
+            name: promotion-check
+            price: 1
+          timeout: 10s

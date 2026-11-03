@@ -1,0 +1,60 @@
+# Points Crossplane's AWS and GCP providers at Floci (floci.yaml) and floci-gcp
+# (floci-gcp.yaml). Both emulators accept any credentials.
+#
+# AWS: the endpoint override applies only to the services listed. With none
+# listed, every call still goes to real AWS. Floci serves S3 path-style only.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: floci-credentials
+  namespace: crossplane-system
+stringData:
+  credentials: |
+    [default]
+    aws_access_key_id = test
+    aws_secret_access_key = test
+---
+apiVersion: aws.upbound.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: default
+spec:
+  credentials:
+    source: Secret
+    secretRef:
+      namespace: crossplane-system
+      name: floci-credentials
+      key: credentials
+  endpoint:
+    services: [s3]
+    hostnameImmutable: true
+    url:
+      type: Static
+      static: http://floci.floci-system.svc.cluster.local:4566
+  s3_use_path_style: true
+  skip_credentials_validation: true
+  skip_metadata_api_check: true
+  skip_requesting_account_id: true
+---
+# GCP: the ProviderConfig has no endpoint field. The provider reads the
+# GOOGLE_STORAGE_CUSTOM_ENDPOINT that demo.sh sets on its pod instead.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: floci-gcp-token
+  namespace: crossplane-system
+stringData:
+  token: floci-local-token
+---
+apiVersion: gcp.upbound.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: default
+spec:
+  projectID: floci-local
+  credentials:
+    source: AccessToken
+    secretRef:
+      namespace: crossplane-system
+      name: floci-gcp-token
+      key: token

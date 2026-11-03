@@ -1,0 +1,65 @@
+# Floci: a free, MIT-licensed local AWS emulator (https://github.com/floci-io/floci).
+# It replaces LocalStack here because LocalStack releases after 4.14.0 refuse
+# to start without an auth token. Crossplane reaches it at
+# http://floci.floci-system.svc.cluster.local:4566 (see providerconfig.yaml).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: floci-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: floci
+  namespace: floci-system
+  labels:
+    app.kubernetes.io/name: floci
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: floci
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: floci
+    spec:
+      # Service links would inject FLOCI_PORT=tcp://..., which Floci reads as
+      # its own floci.port setting and fails to start.
+      enableServiceLinks: false
+      containers:
+        - name: floci
+          image: floci/floci:2.3.0
+          ports:
+            - name: edge
+              containerPort: 4566
+          env:
+            # The web console runs as a Docker sidecar, which a pod cannot start.
+            - name: FLOCI_SERVICES_UI_ENABLED
+              value: "false"
+          readinessProbe:
+            httpGet:
+              path: /_localstack/health
+              port: edge
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: floci
+  namespace: floci-system
+  labels:
+    app.kubernetes.io/name: floci
+spec:
+  selector:
+    app.kubernetes.io/name: floci
+  ports:
+    - name: edge
+      port: 4566
+      targetPort: edge

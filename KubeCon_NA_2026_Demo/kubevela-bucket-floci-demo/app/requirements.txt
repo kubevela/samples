@@ -1,0 +1,10 @@
+flask==3.1.3
+werkzeug==3.1.9
+# Cloud storage SDKs — one per backend. boto3 for AWS S3, google-cloud-storage
+# for GCP Cloud Storage. Both are installed so the same image runs on either
+# cloud; only STORAGE_PROVIDER decides which one is used at runtime.
+boto3==1.43.123
+google-cloud-storage==3.17.1
+# The bucket browser shows times in Salt Lake City's zone; slim images have no
+# system zone database.
+tzdata==2026.6
